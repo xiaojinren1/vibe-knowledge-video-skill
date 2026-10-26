@@ -1,0 +1,9 @@
+node_modules/
+out/
+.DS_Store
+*.mp4
+*.mov
+*.webm
+.env
+.env.*
+!.env.example
