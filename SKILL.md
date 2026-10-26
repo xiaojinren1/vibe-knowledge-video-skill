@@ -18,9 +18,11 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 7. Implement the video in Remotion. Read the official Remotion Skills installed in the project before editing. Use frame-driven animation with `useCurrentFrame()`, `interpolate()`, `spring()`, `Sequence`, and `Series`; do not use CSS animations, random values, or wall-clock time.
 8. Prefer native HTML, SVG, Canvas, equations, charts, timelines, maps, and simple geometric illustrations. Use external images or clips only when they materially improve understanding and their license/source is recorded.
 9. Add narration only from user-provided audio or an available authorized TTS service. Do not silently upload private text to an external voice service. Put media in `public/` and load it with `staticFile()`.
-10. Generate captions from the final narration timing. Keep two lines maximum, provide safe margins, and maintain readable contrast. For word-level timing, use `@remotion/captions`.
-11. Render a 10-second preview first. Review text overflow, factual accuracy, frame continuity, pacing, audio sync, and attribution. Iterate before rendering the full video.
-12. Export the full MP4 and deliver the project directory, preview, final video, `video-brief.json`, and `research/sources.md`. State any claims or media that still require manual verification.
+10. When background music is requested, use licensed music with recorded attribution or generate an original deterministic track. Build music from chords, rhythm, melody, and envelopes; do not use white, pink, or brown noise as an audible music bed. Keep music under narration and test it on ordinary phone or laptop speakers. Use `scripts/generate-light-science-music.py` for a neutral original starting point.
+11. Generate captions from the final narration timing. Keep two lines maximum, provide safe margins, and maintain readable contrast. For word-level timing, use `@remotion/captions`.
+12. Render a 10-second preview first. Review text overflow, factual accuracy, frame continuity, pacing, audio sync, music character, and attribution. Iterate before rendering the full video.
+13. Export the full MP4, then normalize it with `scripts/finalize-video.sh <input.mp4> <output.mp4>`. This produces H.264 High/yuv420p video, AAC-LC stereo audio, an `avc1` tag, and a fast-start MP4 index. Never publish an unchecked stream-copy result.
+14. Deliver the project directory, preview, final video, `video-brief.json`, and `research/sources.md`. State any claims or media that still require manual verification.
 
 ## Project standards
 
@@ -43,6 +45,8 @@ Use a dark editorial background, one bright accent color, restrained glow, large
 npm run dev
 npx remotion render Preview10s out/preview.mp4
 npx remotion render FullVideo out/final.mp4
+python3 scripts/generate-light-science-music.py --duration 90 --output public/audio/light-science-music.wav
+bash scripts/finalize-video.sh out/final.mp4 out/final-compatible.mp4
 ```
 
 On Windows, pass composition props using a JSON file rather than inline shell JSON.
@@ -56,5 +60,8 @@ Do not call the video complete until:
 - the 10-second preview renders successfully;
 - no text is clipped at 16:9 or the requested format;
 - captions match the narration;
+- background audio sounds musical rather than like hiss, rumble, or static;
 - media licenses and attributions are recorded;
 - the full render command succeeds.
+- the delivered MP4 passes a complete FFmpeg decode and `ffprobe` confirms H.264/yuv420p plus AAC-LC whenever audio is present;
+- if the file is uploaded, download or materialize that uploaded artifact and verify its size, hash, and decodability instead of assuming upload success means media integrity.
