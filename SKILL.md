@@ -34,7 +34,8 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 - Use safe typography: system Chinese fonts first unless a redistributable local font is bundled.
 - Check portrait output separately; do not simply crop a landscape composition.
 - Prefer continuous explanatory action over static stickers: keep the main subject moving while labels, arrows, diagrams, and narration explain what is happening. Couple translation, rotating parts, suspension or body motion, spray or dust, and background parallax to the same frame-driven speed signal.
-- Establish the physical contact line before drawing: wheels, skis, feet, hulls, roads, and waterlines must meet plausibly. Do not place the entire subject below the surface or make it float above the ground unless the explanation explicitly requires that state.
+- Establish one numeric physical contact anchor before drawing and reuse its formula in every scene: wheels, skis, feet, hulls, roads, and waterlines must meet plausibly. Do not manually eyeball a different vertical position per shot. Do not place the entire subject below the surface or make it float above the ground unless the explanation explicitly requires that state.
+- For people, extract a pose skeleton from the reference before styling: head, neck, shoulder, elbow, hand, hip, knee, ankle, and foot. Verify that hands reach the controls, hips meet the seat, knees bend around the body, and feet reach the pegs or ground. A filled torso plus straight limb strokes is not a finished rider.
 - Keep branding off by default. Do not add a public-account name, video-channel name, creator handle, logo, watermark, or recurring account label unless the user explicitly requests it or supplies approved brand assets.
 - Never imitate a living creator's exact branded style, voice, avatar, logo, or signature transitions. Translate high-level traits such as cinematic pacing or data-driven motion into an original visual system.
 
