@@ -16,7 +16,7 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 5. Create a scene plan with a strong question in the first 3 seconds, one idea per scene, a visual payoff every 5–8 seconds, and a concise ending. Use [references/storyboard-guide.md](references/storyboard-guide.md).
 6. If no Remotion project exists, run `bash scripts/bootstrap-remotion.sh <project-directory>`. This scaffolds the official blank template and installs the official Remotion Agent Skills. Never overwrite an existing non-empty directory.
 7. Implement the video in Remotion. Read the official Remotion Skills installed in the project before editing. Use frame-driven animation with `useCurrentFrame()`, `interpolate()`, `spring()`, `Sequence`, and `Series`; do not use CSS animations, random values, or wall-clock time.
-8. Prefer native HTML, SVG, Canvas, equations, charts, timelines, maps, and simple geometric illustrations. Use external images or clips only when they materially improve understanding and their license/source is recorded.
+8. Prefer native HTML, SVG, Canvas, equations, charts, timelines, maps, and purposeful illustrations. For a recognizable real subject such as a vehicle, machine, animal, person, or product, do not use a crude stick figure or generic geometric outline as the final visual. Preserve the subject's silhouette, proportions, defining components, and functional structure. When the user provides reference images, inspect them first and create an original detailed visual rather than copying the source. Use external images or clips only when they materially improve understanding and their license/source is recorded.
 9. Add narration only from user-provided audio or an available authorized TTS service. Do not silently upload private text to an external voice service. Put media in `public/` and load it with `staticFile()`.
 10. When background music is requested, use licensed music with recorded attribution or generate an original deterministic track. Build music from chords, rhythm, melody, and envelopes; do not use white, pink, or brown noise as an audible music bed. Keep music under narration and test it on ordinary phone or laptop speakers. Use `scripts/generate-light-science-music.py` for a neutral original starting point.
 11. Generate captions from the final narration timing. Keep two lines maximum, provide safe margins, and maintain readable contrast. For word-level timing, use `@remotion/captions`.
@@ -33,6 +33,7 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 - Use deterministic animation and stable seeds when procedural graphics are needed.
 - Use safe typography: system Chinese fonts first unless a redistributable local font is bundled.
 - Check portrait output separately; do not simply crop a landscape composition.
+- Keep branding off by default. Do not add a public-account name, video-channel name, creator handle, logo, watermark, or recurring account label unless the user explicitly requests it or supplies approved brand assets.
 - Never imitate a living creator's exact branded style, voice, avatar, logo, or signature transitions. Translate high-level traits such as cinematic pacing or data-driven motion into an original visual system.
 
 ## Default visual direction
@@ -59,6 +60,8 @@ Do not call the video complete until:
 - the brief validator passes;
 - representative still frames from the opening, scene midpoints, transitions, and ending have been reviewed;
 - no text is clipped at 16:9 or the requested format;
+- recognizable real subjects are visually credible and not reduced to placeholder-level line art;
+- no unrequested account name, channel name, logo, or watermark appears in the video;
 - captions match the narration;
 - background audio sounds musical rather than like hiss, rumble, or static;
 - media licenses and attributions are recorded;
