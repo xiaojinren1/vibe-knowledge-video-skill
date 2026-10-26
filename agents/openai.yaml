@@ -1,0 +1,14 @@
+interface:
+  display_name: Vibe 知识视频
+  short_description: 用 Remotion 快速制作可核验的高质感中文科普视频
+  default_prompt: Use $vibe-knowledge-video to create a Chinese science explainer
+    video with Remotion.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
