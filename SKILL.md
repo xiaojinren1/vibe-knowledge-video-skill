@@ -13,7 +13,7 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 2. Research the topic before writing. Prefer primary sources, papers, standards, official statistics, and reputable institutions. Record every factual claim in `research/sources.md` with URL, title, date, and the claim it supports.
 3. Separate verified facts, interpretation, and analogy. Remove unsupported claims. Do not invent quotations, studies, numbers, dates, or causal relationships.
 4. Create `video-brief.json` using [references/brief-schema.md](references/brief-schema.md). Run `node scripts/validate-brief.mjs video-brief.json` before coding scenes.
-5. Create a scene plan with a strong question in the first 3 seconds, one idea per scene, a visual payoff every 5–8 seconds, and a concise ending. Use [references/storyboard-guide.md](references/storyboard-guide.md).
+5. Create a scene plan with a strong question in the first 3 seconds, one idea per scene, a visual payoff every 5–8 seconds, and a concise ending. Preserve one clear narrative spine. Remove historical comparisons, side facts, or extra timelines when they interrupt the requested explanation rather than advancing it. Use [references/storyboard-guide.md](references/storyboard-guide.md).
 6. If no Remotion project exists, run `bash scripts/bootstrap-remotion.sh <project-directory>`. This scaffolds the official blank template and installs the official Remotion Agent Skills. Never overwrite an existing non-empty directory.
 7. Implement the video in Remotion. Read the official Remotion Skills installed in the project before editing. Use frame-driven animation with `useCurrentFrame()`, `interpolate()`, `spring()`, `Sequence`, and `Series`; do not use CSS animations, random values, or wall-clock time.
 8. Prefer native HTML, SVG, Canvas, equations, charts, timelines, maps, and purposeful illustrations. For a recognizable real subject such as a vehicle, machine, animal, person, or product, do not use a crude stick figure or generic geometric outline as the final visual. Preserve the subject's silhouette, proportions, defining components, and functional structure. When the user provides reference images, inspect them first and create an original detailed visual rather than copying the source. For moving subjects, read [references/motion-direction-prompt.md](references/motion-direction-prompt.md) and define contact geometry, proportions, motion coupling, occlusion, and scene continuity before implementation. Use external images or clips only when they materially improve understanding and their license/source is recorded.
@@ -28,12 +28,13 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 
 - Register a `FullVideo` composition. Add a separate preview composition only when the user explicitly requests preview rendering or it materially simplifies development.
 - Put editable content in data files rather than scattering copy through components.
-- Build reusable components for title, caption, source label, chart, timeline, and scene transition.
-- Keep source labels visible for statistics and quotations; add a final references scene.
+- Build reusable components for title, caption, chart, timeline, and scene transition. Keep source metadata in the project, but do not burn source names, dates, or reference labels into the video by default. Show an on-screen source only when the user requests it, a quotation requires attribution, or the claim would otherwise be misleading.
 - Use deterministic animation and stable seeds when procedural graphics are needed.
 - Use safe typography: system Chinese fonts first unless a redistributable local font is bundled.
 - Check portrait output separately; do not simply crop a landscape composition.
 - Prefer continuous explanatory action over static stickers: keep the main subject moving while labels, arrows, diagrams, and narration explain what is happening. Couple translation, rotating parts, suspension or body motion, spray or dust, and background parallax to the same frame-driven speed signal.
+- When the explanation follows a journey, process, growth path, or countdown, create a persistent start-to-finish progress cue. The subject should enter near the beginning, continue progressing while concepts are explained, and visibly reach the destination or final state at the ending.
+- Derive secondary physical effects from the underlying action: speed controls spray length, wheel rotation, wake, dust, blur, or vibration; direction controls where those effects travel. Do not add generic decoration that ignores the subject's motion.
 - Establish one numeric physical contact anchor before drawing and reuse its formula in every scene: wheels, skis, feet, hulls, roads, and waterlines must meet plausibly. Do not manually eyeball a different vertical position per shot. Do not place the entire subject below the surface or make it float above the ground unless the explanation explicitly requires that state.
 - Keep transform math and placement math in the same coordinate system. If contact positions are calculated from the subject's top-left corner, scale and rotate from that same origin or explicitly compensate for the transform origin. Test the smallest and largest subject scales because center-origin scaling can silently shift a subject below its contact line.
 - For a real machine, inventory asymmetric functional parts from reference images before drawing. Do not reuse one generic wheel, wing, support, or tool component when the real front and rear or left and right parts differ. Preserve which part steers, supports, propels, or contacts the environment.
@@ -66,6 +67,7 @@ Do not call the video complete until:
 - the brief validator passes;
 - representative still frames from the opening, scene midpoints, transitions, and ending have been reviewed;
 - every scene containing the main subject has been reviewed at least once; do not approve subject geometry from only the final frame;
+- explanatory text, labels, arrows, and progress indicators do not overlap the main subject or captions at any reviewed frame;
 - no text is clipped at 16:9 or the requested format;
 - recognizable real subjects are visually credible and not reduced to placeholder-level line art;
 - human proportions are not visibly compressed or stretched, articulated parts connect naturally, and the subject's scale remains consistent across scenes;
@@ -74,6 +76,7 @@ Do not call the video complete until:
 - asymmetric real-world components match the references and are not duplicated from a generic reusable shape;
 - expected mechanical motion is visible and synchronized, such as wheel or propeller rotation matching travel speed, with secondary motion such as spray, suspension, or body pitch;
 - the main explanatory sequence uses continuous action where the topic involves motion, rather than relying only on static diagrams;
+- any journey or process has a coherent visual start, ongoing progress, and visible completion;
 - no unrequested account name, channel name, logo, or watermark appears in the video;
 - captions match the narration;
 - background audio sounds musical rather than like hiss, rumble, or static;
