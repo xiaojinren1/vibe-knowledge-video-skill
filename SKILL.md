@@ -35,6 +35,8 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 - Check portrait output separately; do not simply crop a landscape composition.
 - Prefer continuous explanatory action over static stickers: keep the main subject moving while labels, arrows, diagrams, and narration explain what is happening. Couple translation, rotating parts, suspension or body motion, spray or dust, and background parallax to the same frame-driven speed signal.
 - Establish one numeric physical contact anchor before drawing and reuse its formula in every scene: wheels, skis, feet, hulls, roads, and waterlines must meet plausibly. Do not manually eyeball a different vertical position per shot. Do not place the entire subject below the surface or make it float above the ground unless the explanation explicitly requires that state.
+- Keep transform math and placement math in the same coordinate system. If contact positions are calculated from the subject's top-left corner, scale and rotate from that same origin or explicitly compensate for the transform origin. Test the smallest and largest subject scales because center-origin scaling can silently shift a subject below its contact line.
+- For a real machine, inventory asymmetric functional parts from reference images before drawing. Do not reuse one generic wheel, wing, support, or tool component when the real front and rear or left and right parts differ. Preserve which part steers, supports, propels, or contacts the environment.
 - For people, extract a pose skeleton from the reference before styling: head, neck, shoulder, elbow, hand, hip, knee, ankle, and foot. Verify that hands reach the controls, hips meet the seat, knees bend around the body, and feet reach the pegs or ground. A filled torso plus straight limb strokes is not a finished rider.
 - Keep branding off by default. Do not add a public-account name, video-channel name, creator handle, logo, watermark, or recurring account label unless the user explicitly requests it or supplies approved brand assets.
 - When committing project or skill changes for a Chinese-speaking user, use concise Chinese Git commit messages unless the user requests another language.
@@ -68,6 +70,8 @@ Do not call the video complete until:
 - recognizable real subjects are visually credible and not reduced to placeholder-level line art;
 - human proportions are not visibly compressed or stretched, articulated parts connect naturally, and the subject's scale remains consistent across scenes;
 - physical contact and occlusion are credible: the subject does not unintentionally sink below water, intersect the ground, or pass through other objects;
+- the smallest-scale and largest-scale appearances preserve the same contact anchor after transforms;
+- asymmetric real-world components match the references and are not duplicated from a generic reusable shape;
 - expected mechanical motion is visible and synchronized, such as wheel or propeller rotation matching travel speed, with secondary motion such as spray, suspension, or body pitch;
 - the main explanatory sequence uses continuous action where the topic involves motion, rather than relying only on static diagrams;
 - no unrequested account name, channel name, logo, or watermark appears in the video;
