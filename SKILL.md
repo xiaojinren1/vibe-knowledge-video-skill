@@ -20,13 +20,13 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 9. Add narration only from user-provided audio or an available authorized TTS service. Do not silently upload private text to an external voice service. Put media in `public/` and load it with `staticFile()`.
 10. When background music is requested, use licensed music with recorded attribution or generate an original deterministic track. Build music from chords, rhythm, melody, and envelopes; do not use white, pink, or brown noise as an audible music bed. Keep music under narration and test it on ordinary phone or laptop speakers. Use `scripts/generate-light-science-music.py` for a neutral original starting point.
 11. Generate captions from the final narration timing. Keep two lines maximum, provide safe margins, and maintain readable contrast. For word-level timing, use `@remotion/captions`.
-12. Render a 10-second preview first. Review text overflow, factual accuracy, frame continuity, pacing, audio sync, music character, and attribution. Iterate before rendering the full video.
+12. Review representative still frames before the full render. Check the opening, every scene midpoint, transitions, and the final frame for text overflow, factual accuracy, layout, music usage, and attribution. Do not render or upload a 10-second preview unless the user explicitly requests one; avoid duplicate rendering and storage costs.
 13. Export the full MP4, then normalize it with `scripts/finalize-video.sh <input.mp4> <output.mp4>`. This produces H.264 High/yuv420p video, AAC-LC stereo audio, an `avc1` tag, and a fast-start MP4 index. Never publish an unchecked stream-copy result.
-14. Deliver the project directory, preview, final video, `video-brief.json`, and `research/sources.md`. State any claims or media that still require manual verification.
+14. Deliver the project directory, final video, `video-brief.json`, and `research/sources.md`. Include a preview only when explicitly requested. State any claims or media that still require manual verification.
 
 ## Project standards
 
-- Register at least `Preview10s` and `FullVideo` compositions.
+- Register a `FullVideo` composition. Add a separate preview composition only when the user explicitly requests preview rendering or it materially simplifies development.
 - Put editable content in data files rather than scattering copy through components.
 - Build reusable components for title, caption, source label, chart, timeline, and scene transition.
 - Keep source labels visible for statistics and quotations; add a final references scene.
@@ -43,7 +43,7 @@ Use a dark editorial background, one bright accent color, restrained glow, large
 
 ```bash
 npm run dev
-npx remotion render Preview10s out/preview.mp4
+npx remotion render FullVideo out/review-frames --frames=0,450,900,1350,1800,2250,2699 --image-format=png
 npx remotion render FullVideo out/final.mp4
 python3 scripts/generate-light-science-music.py --duration 90 --output public/audio/light-science-music.wav
 bash scripts/finalize-video.sh out/final.mp4 out/final-compatible.mp4
@@ -57,7 +57,7 @@ Do not call the video complete until:
 
 - every factual claim has a source or is clearly labeled as interpretation;
 - the brief validator passes;
-- the 10-second preview renders successfully;
+- representative still frames from the opening, scene midpoints, transitions, and ending have been reviewed;
 - no text is clipped at 16:9 or the requested format;
 - captions match the narration;
 - background audio sounds musical rather than like hiss, rumble, or static;
