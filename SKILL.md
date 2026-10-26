@@ -37,6 +37,7 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 - Establish one numeric physical contact anchor before drawing and reuse its formula in every scene: wheels, skis, feet, hulls, roads, and waterlines must meet plausibly. Do not manually eyeball a different vertical position per shot. Do not place the entire subject below the surface or make it float above the ground unless the explanation explicitly requires that state.
 - For people, extract a pose skeleton from the reference before styling: head, neck, shoulder, elbow, hand, hip, knee, ankle, and foot. Verify that hands reach the controls, hips meet the seat, knees bend around the body, and feet reach the pegs or ground. A filled torso plus straight limb strokes is not a finished rider.
 - Keep branding off by default. Do not add a public-account name, video-channel name, creator handle, logo, watermark, or recurring account label unless the user explicitly requests it or supplies approved brand assets.
+- When committing project or skill changes for a Chinese-speaking user, use concise Chinese Git commit messages unless the user requests another language.
 - Never imitate a living creator's exact branded style, voice, avatar, logo, or signature transitions. Translate high-level traits such as cinematic pacing or data-driven motion into an original visual system.
 
 ## Default visual direction
@@ -62,6 +63,7 @@ Do not call the video complete until:
 - every factual claim has a source or is clearly labeled as interpretation;
 - the brief validator passes;
 - representative still frames from the opening, scene midpoints, transitions, and ending have been reviewed;
+- every scene containing the main subject has been reviewed at least once; do not approve subject geometry from only the final frame;
 - no text is clipped at 16:9 or the requested format;
 - recognizable real subjects are visually credible and not reduced to placeholder-level line art;
 - human proportions are not visibly compressed or stretched, articulated parts connect naturally, and the subject's scale remains consistent across scenes;
