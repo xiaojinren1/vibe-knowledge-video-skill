@@ -11,13 +11,15 @@ Describe the shot in this order:
    Keep CSS/SVG transform origins consistent with this formula. A top-left contact formula requires a top-left scale origin unless the origin offset is included mathematically. Check the minimum and maximum rendered scales.
 3. **Primary motion** — Define screen-space direction, speed, acceleration, and whether the camera follows the subject.
 4. **Coupled motion** — Tie wheels, tracks, propellers, limbs, suspension, body pitch, spray, dust, wakes, shadows, and parallax to the same speed signal. Avoid decorative motion unrelated to cause and effect.
-5. **Explanatory overlays** — Add labels, arrows, cutaways, or numbers while the subject continues moving. Keep overlays clear of the subject and subtitles.
-6. **Continuity** — Preserve subject scale, orientation, colors, proportions, contact line, and motion direction between scenes.
+5. **Explanatory overlays** — Add labels, arrows, cutaways, or numbers while the subject continues moving. Reserve explicit text zones before placing the subject, and keep overlays clear of the subject and subtitles at every reviewed frame.
+6. **Continuity** — Preserve subject scale, orientation, colors, proportions, contact line, and motion direction between scenes. For a journey or process, carry one global progress value across scenes so the subject enters at the beginning and reaches the destination or final state at the ending.
 7. **Negative constraints** — Explicitly reject compressed anatomy, stretched limbs, disconnected joints, frozen wheels, sliding without rotation, floating above the surface, sinking below the surface, geometry intersections, and placeholder-level line art. Disable pitch or downward bobbing that can push the contact point through the surface; use upward-only bobbing or move the subject and contact assembly together.
 
 ## Reference decomposition for real machines
 
 Before drawing, make a short parts table from at least one clear reference: component, silhouette, location, connection, motion, and purpose. Explicitly compare front versus rear and left versus right. Never infer symmetry when the reference shows different functions. For a water-running motorcycle, distinguish the conventional steering front tyre from the rear paddle/deep-lug propulsion wheel, then distinguish both wheels from the front and rear planing skis and their mounting struts.
+
+Treat the machine example as one application of a general rule, not as a fixed template. For any topic—animal locomotion, industrial equipment, medicine, history, economics, or software—verify the real subject or mechanism first, identify the causal parts that matter, and animate only relationships supported by the evidence.
 
 ## Reusable Chinese prompt
 
