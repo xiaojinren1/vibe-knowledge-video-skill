@@ -1,0 +1,15 @@
+{
+  "title": "为什么天空是蓝色的？",
+  "audience": "普通成年人",
+  "language": "zh-CN",
+  "durationSeconds": 10,
+  "aspectRatio": "16:9",
+  "fps": 30,
+  "visualStyle": {"background": "#080B14", "foreground": "#F7F8FC", "accent": "#66E3FF", "mood": "清晰、克制、具有科技感"},
+  "scenes": [
+    {"id": "hook", "startSeconds": 0, "durationSeconds": 3, "narration": "天空明明没有颜色，为什么我们看到的是蓝色？", "onScreenText": "天空为什么是蓝色？", "visual": "白光进入大气，蓝光散射路径被强调", "claims": []},
+    {"id": "mechanism", "startSeconds": 3, "durationSeconds": 7, "narration": "短波长的蓝光在大气中更容易向各个方向散射。", "onScreenText": "短波长 → 更强散射", "visual": "不同波长光线穿过粒子，蓝光散射角度更明显", "claims": ["claim-001"]}
+  ],
+  "claims": [{"id": "claim-001", "text": "可见光中的短波长光在瑞利散射中更强", "sourceUrl": "https://spaceplace.nasa.gov/blue-sky/en/", "sourceTitle": "Why Is the Sky Blue? - NASA Space Place", "sourceDate": "2026-10-26", "status": "verified"}],
+  "audio": {"narrationFile": null, "musicFile": null}
+}
