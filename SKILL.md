@@ -45,6 +45,8 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 
 ## Default visual direction
 
+For a single continuous protagonist, instantiate the subject once outside scene-local sequences; let scenes add explanatory overlays only. Keep the subject in the central action zone, use background travel for continuous motion, and derive narration milestones, captions, distance, and start/end states from one global timeline. See the motion reference for pixel-contact and rotation checks.
+
 Use a dark editorial background, one bright accent color, restrained glow, large Chinese typography, thin grid lines, and purposeful motion. Avoid excessive particles, card grids, random gradients, fake 3D, and constant camera movement. Let the concept determine the animation.
 
 ## Commands
