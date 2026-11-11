@@ -141,7 +141,7 @@ $FF -y -i out/v.mp4 -i out/_master.wav -map 0:v -map 1:a   -vf "scale=in_range=f
 
 ## 八、换风格
 
-只改 `styles/paper-editorial.json`（或用 `references/style-templates.md` 里列的待做风格新增一份 JSON）。
+只改 `styles/<id>.json`（或用 `references/style-templates.md` 里列的待做风格新增一份 JSON）。
 组件不感知色值与曲线，所以换风格不需要改 `src/` 下任何代码。
 
 ## 九、换选题
@@ -149,3 +149,81 @@ $FF -y -i out/v.mp4 -i out/_master.wav -map 0:v -map 1:a   -vf "scale=in_range=f
 - 幕的设计：`template/src/scenes/KnowledgeVideo.tsx` 里的 `REGISTRY` 按 scene id 挂专属幕
 - 没注册的 id 自动走 `GenericScene`（标题两行 + 旁白摘要），所以新 brief 立刻能出片，再逐步做专属设计
 - 想加新的版式零件（图表 / 时间轴 / 对比条），写进 `src/kit/`，不要在幕里复制粘贴
+
+## 十、竖屏（9:16）专用流程
+
+竖屏不是把横屏裁一刀。多出来的四件事：安全区、字幕断行、字号阶梓、构图重心。
+
+**1. 安全区写进 token**
+
+```json
+"layout": { "safeArea": { "top": 170, "bottom": 1560 } },
+"captions": { "baseline": 1392 }
+```
+
+抖音/视频号的底部 UI 占约 250px。字幕基线放 `y ≈ 1400`（1080×1920），
+不要贴底，也不要把内容放到 1560 以下，除非你不需要它被看到。
+
+**2. 字幕按人工写好的行切分，不按字数均分**
+
+中文 TTS 的字级边界是"词"，不是"字"。均分会切在词组中间（"有人把旧 / 录像截出"）。
+正确做法：在 brief 里给每幕写 `captionLines`，再按"每行字数"去吃掉对应的 word 边界：
+
+```json
+{ "id": "cut",
+  "narration": "转折发生在今年九月。有人把旧录像截出十几秒…",
+  "captionLines": ["转折发生在今年九月", "有人把旧录像截出十几秒", "配上鼓点口令", "重新发了出来"] }
+```
+
+实现见 `template/src/kit/dossier.tsx` 的 `buildCues()`。一行 10–15 字。
+
+**3. 主体占画面 55–75%**
+
+低于 50% 显得空，高于 80% 挤掉标题。竖屏的信息密度天生比横屏低，
+宁可少讲一件事，也不要缩小字。
+
+**4. 字体可选项（Windows 自带，无需安装）**
+
+| 用途 | 字体族 |
+|---|---|
+| 档案/公文感标题 | `"FangSong", "STFangsong", "仿宋"` |
+| 手写/讲解 | `"KaiTi", "STKaiti", "楷体"` |
+| 正文黑体 | `"Noto Sans SC"`（本仓已列三档字重） |
+| 宋体标题 | `"Source Han Serif SC"` |
+| 等宽注释 | `"Cascadia Mono", "Consolas"` |
+
+## 十一、音效（让画面有重音）
+
+旁白+配乐之外，第三层是 **音效层**。代码渲染的画面没有“实拍声音”，重音全靠它。
+`scripts/make-sfx.py` 提供七个确定性预设：`drum / gong / ker / whoosh / typewriter / stamp / paper`。
+
+```bash
+# 单条素材
+python scripts/make-sfx.py --preset stamp --out public/audio/stamp.wav
+
+# 按 cue 列表铺一整条（时间是绝对秒，跟 narration-timing.json 对齐）
+python scripts/make-sfx.py --cues cues.json --duration 64 --out public/audio/sfx.wav
+```
+
+```json
+[{ "at": 0.0, "preset": "paper", "gain": 0.6 },
+ { "at": 0.05, "preset": "stamp", "gain": 0.9 },
+ { "at": 8.52, "preset": "typewriter", "gain": 0.5 }]
+```
+
+约束：
+
+- 底鼓一律压到 **120Hz 以下**，手机喇叭才不刺
+- 锣用**非谐分音**（1 / 2.37 / 3.71 / 5.13），纯谐波听着像“叮”
+- 噪声只给瞬态（木鱼/嗖/打字机），**不当铺底**；铺底用 drone + 低通
+- 音效总量控制在旁白之下：混音时音量 0.3–0.9，别抢人声
+
+卷宗风的完整范例：`scripts/make-archive-audio.py`（低频 drone + 纸张 + 打字机 + 印章，按幕起点对齐）。
+
+## 十二、叙事/娱乐题材的替代路线
+
+用户想做的内容涉及“人物表演 / 笑点 / 漫剧”时，不要硬做人物（原因见 `references/code-video-limits.md`）。
+换成这套：**把“表演”换成“证据”，把“情绪”换成“印章 + 鼓点”**。
+
+已验证案例：两个非遗动作的网络走红，用 `archive-dossier` 做成 64 秒档案片：
+卷首档案袋 → 两张证物照片 → 埋没八年的时间轴 → 被截取的剪辑记录 → 刷屏示意 → 盖章结论。

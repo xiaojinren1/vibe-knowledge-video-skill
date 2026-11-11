@@ -4,14 +4,18 @@
 
 ## 能做什么
 
-- 将科技、科学、历史、商业、心理学等主题转成可视化科普视频
+- **信息型**：科技、科学、历史、商业、心理学等主题的科普/讲解片（纸感编辑风、深色数据风）
+- **叙事型**：事件还原、传播复盘、商业故事（卷宗档案风，把“一个东西为什么火了”当案子办）
+- 竖屏 9:16 或横屏 16:9，字幕按人工写好的行切分
 - 使用 Remotion 生成 React、SVG、Canvas 动画
 - 为事实性表述绑定原始来源
-- 先生成 10 秒预览，再渲染完整 MP4
+- 默认先渲静帧审片，再渲完整 MP4
 - 校验场景时长、Claim 引用和资料完整性
-- 默认支持中文、16:9、60–120 秒视频
-- 可选成品化管线（`scripts/` + `template/`）：旁白决定镜头长度、程序合成 BGM、SRT 字幕、响度归一，**全程 0 元**
+- 可选成品化管线：旁白决定镜头长度、程序合成 BGM + 音效、SRT 字幕、响度归一，**全程 0 元**
 - 视觉风格由 `styles/*.json` token 驱动，换风格不改代码
+
+**做不了**：人物表演、漫剧、真人向、喜剧节奏。这类需求靠逐帧美术判断，代码渲不到发布水准，
+先看 [references/code-video-limits.md](references/code-video-limits.md)，再用“把表演换成证据”的替代方案。
 
 > 新会话从哪开始、一句话怎么提需求、环境在哪：见 [START.md](START.md)。
 
@@ -75,14 +79,18 @@ npm run dev
 | `references/storyboard-guide.md` | 分镜与叙事指南 |
 | `references/production-workflow.md` | **成片作业流程**：旁白→BGM→字幕→渲染→归一化→自检 |
 | `references/style-templates.md` | 风格模板 token 说明与待做风格清单 |
+| `references/code-video-limits.md` | **能力边界**：代码渲视频能做什么、做不了什么，以及"表演改证据"的替代方案 |
 | `references/research-ai-video-routes.md` | 五条 AI 视频路线与 9 个开源项目的调研对比 |
 | `scripts/make-narration.py` | 由 brief 生成旁白（edge-tts）并写回真实时长 |
 | `scripts/make-bgm.py` | numpy 合成原创 BGM（确定性、可商用） |
+| `scripts/make-sfx.py` | 确定性音效：鼓/锣/木鱼/嗖/打字机/印章/纸张（可单条，可按 cue 列表铺整轨） |
 | `scripts/make-srt.py` | 生成零重叠 SRT 字幕 |
 | `scripts/_media.py` | ffmpeg 定位与时长探测 |
 | `assets/styles/paper-editorial.json` | 纸感编辑风风格模板 |
 | `assets/example-memory-brief.json` | 5 幕示例 brief（记忆为什么会被改写，68 秒） |
 | `template/src/` | Remotion 工程模板：kit（tokens/动效/后期）+ 幕组件 + Root |
+| `template/src/kit/dossier.tsx` | 卷宗风零件：纸/页眉页脚/印章/红线/证物框/按行切字幕 |
+| `assets/styles/archive-dossier.json` | 卷宗档案风 token（9:16，含安全区与字幕基线） |
 
 ## 成品化管线（可选）
 

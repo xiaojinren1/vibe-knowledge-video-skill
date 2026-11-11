@@ -45,9 +45,17 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 
 ## Default visual direction
 
+先判断题材落在哪个区间，再选风格（详见 [references/code-video-limits.md](references/code-video-limits.md)）：
+
+- **信息型**（科普、数据、原理、流程）→ 纸感编辑（`paper-editorial`）或深色数据风。
+- **叙事型**（事件还原、传播复盘、商业故事）→ 卷宗档案（`archive-dossier`）。
+- **人物表演型**（漫剧、角色、笑点、对话）→ **不做**，改为“把表演换成证据”的叙事结构。
+
 For a single continuous protagonist, instantiate the subject once outside scene-local sequences; let scenes add explanatory overlays only. Keep the subject in the central action zone, use background travel for continuous motion, and derive narration milestones, captions, distance, and start/end states from one global timeline. See the motion reference for pixel-contact and rotation checks.
 
 Use a dark editorial background, one bright accent color, restrained glow, large Chinese typography, thin grid lines, and purposeful motion. Avoid excessive particles, card grids, random gradients, fake 3D, and constant camera movement. Let the concept determine the animation.
+
+**竖屏**不做横屏裁切：重排构图重心、字号阶梓与字幕断行，安全区和字幕基线写进 token（见 `production-workflow.md` 第十节）。
 
 ## Style tokens
 
@@ -64,6 +72,8 @@ Two rules matter most:
 - **Narration decides scene length.** Synthesize first, measure with ffprobe, write real durations back into `narration-timing.json` (and the brief with `--update-brief`). Never fix a duration first and cut the voice-over to fit it.
 - **Review stills before rendering the whole video.** A still costs seconds, a full render costs minutes.
 - **Captions follow word-level boundaries, not character proportions.** Ask edge-tts for `boundary="WordBoundary"` and store `words` in `narration-timing.json`; proportional allocation lags by ~0.5s on average.
+- **字幕断行由人写，不由字数均分。** 在 brief 里给每幕写 `captionLines`，再按每行字数吃掉字级边界；均分会切在词组中间。实现见 `template/src/kit/dossier.tsx` 的 `buildCues()`。
+- **音效是第三层，不是装饰。** 旁白+配乐之外加一轨音效（`scripts/make-sfx.py`），幕切、盖章、翻页、敲字各对应一声，画面才有重音。
 - **Normalize loudness with static gain plus a soft limiter, not single-pass `loudnorm`.** A single pass runs in dynamic mode and lifts the noise floor in quiet passages; measure `input_i` first, then apply gain and limit peaks to −1.5 dBTP.
 
 ## Commands
@@ -77,6 +87,7 @@ bash scripts/finalize-video.sh out/final.mp4 out/final-compatible.mp4
 
 python scripts/make-narration.py --project . --update-brief
 python scripts/make-bgm.py --project .
+python scripts/make-sfx.py --cues cues.json --duration 64 --out public/audio/sfx.wav
 python scripts/make-srt.py --project .
 ```
 
@@ -103,6 +114,9 @@ Do not call the video complete until:
 - no unrequested account name, channel name, logo, or watermark appears in the video;
 - captions match the narration;
 - background audio sounds musical rather than like hiss, rumble, or static;
+- 竖屏片：字幕基线不在平台 UI 区内（1080×1920 时 y ≤ 1450），且没有主体被底部 UI 遮住；
+- 叙事片：没有无可靠来源的具体数字；证物框里没有无授权图片；
+- 如果本轮需求包含人物表演/笑点，已明确告知能力边界并给出无表演的替代方案，而不是交出扭捏的角色动画；
 - media licenses and attributions are recorded;
 - the full render command succeeds.
 - the delivered MP4 passes a complete FFmpeg decode and `ffprobe` confirms H.264/yuv420p plus AAC-LC whenever audio is present;

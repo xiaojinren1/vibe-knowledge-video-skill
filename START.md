@@ -74,8 +74,33 @@ python scripts/master-audio.py --input out/_mix.wav --output out/_master.wav --g
 
 ## 现在能做的风格
 
-只有 `paper-editorial`（纸感编辑风：宋体大字 + 纸纹 + 朱红印章）。
-待做风格清单（含参考项目）见 `references/style-templates.md`，加风格只加一个 JSON，不动组件。
+| id | 名称 | 画幅 | 适合题材 |
+|---|---|---|---|
+| `paper-editorial` | 纸感编辑风（宋体大字 + 纸纹 + 朱红印章） | 16:9 | 人文、历史、心理、社科 |
+| `archive-dossier` | 卷宗档案风（仿宋 + 证物框 + 红线 + 时间轴 + 印章） | 9:16 | 事件还原、传播复盘、商业故事 |
+
+两种都不靠“表演”，靠信息组织和图形。想要漫剧/人物表演这条路走不通，原因与替代方案见
+`references/code-video-limits.md`。
+
+## 一条命令铺卷宗风（竖屏叙事片）
+
+```bash
+bash scripts/new-project.sh my-dossier --example ai-history
+cd my-dossier
+# 1) 写 video-brief.json：6 幕，每幕补 captionLines（一行 10–15 字）
+# 2) 旁白（档案解说建议 YunjianNeural，语速 −6%）
+python ../scripts/make-narration.py --project . --voice zh-CN-YunjianNeural --rate=-6% --update-brief
+# 3) 配乐 + 音效
+python ../scripts/make-bgm.py --project .
+python ../scripts/make-sfx.py --cues cues.json --duration 64 --out public/audio/sfx.wav
+# 4) 先静帧再审片
+npx remotion still DossierVideo out/check.png --frame=200 --scale=0.5
+npx remotion render DossierVideo out/v.mp4 --concurrency=6 --crf=19
+```
+
+卷宗零件（纸/页眉页脚/印章/红线/证物框/按行切字幕）在 `template/src/kit/dossier.tsx`，
+跟着 `assets/styles/archive-dossier.json` 的 token 走，换风格不改组件。
+
 
 ## 成本与时间（实测，8 核 16G 无独显）
 

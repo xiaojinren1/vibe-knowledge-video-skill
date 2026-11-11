@@ -1,0 +1,84 @@
+{
+  "id": "archive-dossier",
+  "name": "卷宗档案风（DOSSIER / 9:16）",
+  "category": "narrative",
+  "description": "档案纸 + 证物框 + 红线 + 时间轴 + 朱红印章。把事件当案子办，适合\"一个东西为什么突然火了\"这类传播还原、商业复盘、历史事件。信息是'证据'而不是'解说'。",
+  "canvas": {
+    "aspectRatio": "9:16",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "safeMargin": 72
+  },
+  "palette": {
+    "ink": "#20201D",
+    "paper": "#E7DFCE",
+    "card": "#F4EEE0",
+    "muted": "rgba(32,32,29,0.55)",
+    "accent": "#A5322A"
+  },
+  "typography": {
+    "display": { "family": "title", "size": 104, "weight": 700, "leading": 1.24, "track": "0.02em" },
+    "h1": { "family": "title", "size": 84, "weight": 700, "leading": 1.28, "track": "0.02em" },
+    "h2": { "family": "title", "size": 46, "weight": 700, "leading": 1.4, "track": "0.03em" },
+    "body": { "family": "body", "size": 40, "weight": 500, "leading": 1.85, "track": "0.02em" },
+    "caption": { "family": "title", "size": 46, "weight": 700, "leading": 1.4, "track": "0.05em" },
+    "kicker": { "family": "mono", "size": 22, "weight": 500, "leading": 1.2, "track": "0.24em" }
+  },
+  "fonts": {
+    "title": "\"FangSong\", \"STFangsong\", \"仿宋\", \"Noto Serif SC\", serif",
+    "body": "\"KaiTi\", \"STKaiti\", \"楷体\", \"Noto Serif SC\", serif",
+    "mono": "\"Cascadia Mono\", \"Consolas\", ui-monospace, monospace"
+  },
+  "motion": {
+    "reveal": { "type": "stamp-in", "duration": 7, "distance": 0, "curve": [0.2, 1.4, 0.4, 1] },
+    "standard": { "curve": [0.2, 0.8, 0.2, 1] },
+    "exit": { "curve": [0.4, 0, 1, 1] },
+    "stagger": 4,
+    "springSoft": { "damping": 200, "mass": 0.6, "stiffness": 90 },
+    "springSnap": { "damping": 24, "mass": 0.5, "stiffness": 220 },
+    "maxOvershoot": 1.55
+  },
+  "postEffects": {
+    "grain": 0.045,
+    "vignette": 0.2,
+    "bloom": 0.03,
+    "aberration": 0,
+    "paperTexture": 0.14
+  },
+  "audio": {
+    "bgmVolume": 0.32,
+    "narrationTail": 0.55,
+    "bgmFadeIn": 1.2,
+    "bgmFadeOut": 1.8,
+    "targetLoudness": -16,
+    "truePeak": -1.5,
+    "cuePreset": "dossier"
+  },
+  "captions": {
+    "position": "bottom-center",
+    "baseline": 1392,
+    "maxCharsPerCue": 15,
+    "maxLines": 1,
+    "backdrop": "rgba(24,24,22,0.92)",
+    "textColor": "#F4EEE0",
+    "leadIn": 0.12,
+    "leadOut": 0.35
+  },
+  "layout": {
+    "header": { "left": 72, "top": 72 },
+    "headerRule": { "left": 72, "right": 72, "top": 116 },
+    "footerRule": { "top": 1628 },
+    "footer": { "left": 72, "top": 1648 },
+    "safeArea": { "top": 170, "bottom": 1560 },
+    "columnRule": { "x": 540 }
+  },
+  "hardRules": [
+    "只用四种颜色：墨、纸、卡纸、朱红",
+    "印章只在两种时机出现：定性（均为非遗）与结论（已核实）",
+    "证物框内不得放无授权图片；无素材时用抽象条纹 + EVIDENCE 编号占位",
+    "无可靠来源时禁止出现具体数字（播放量、粉丝数、增长率）",
+    "红线只用于'来源→结论'的指向，不能当装饰",
+    "字幕按人工写好的行切分，一行 10–15 字"
+  ]
+}
