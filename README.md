@@ -10,6 +10,8 @@
 - 先生成 10 秒预览，再渲染完整 MP4
 - 校验场景时长、Claim 引用和资料完整性
 - 默认支持中文、16:9、60–120 秒视频
+- 可选成品化管线（`scripts/` + `template/`）：旁白决定镜头长度、程序合成 BGM、SRT 字幕、响度归一，**全程 0 元**
+- 视觉风格由 `styles/*.json` token 驱动，换风格不改代码
 
 ## 安装
 
@@ -67,6 +69,36 @@ npm run dev
 | `assets/example-video-brief.json` | 10 秒示例 brief |
 | `references/brief-schema.md` | brief 数据结构 |
 | `references/storyboard-guide.md` | 分镜与叙事指南 |
+| `references/production-workflow.md` | **成片作业流程**：旁白→BGM→字幕→渲染→归一化→自检 |
+| `references/style-templates.md` | 风格模板 token 说明与待做风格清单 |
+| `references/research-ai-video-routes.md` | 五条 AI 视频路线与 9 个开源项目的调研对比 |
+| `scripts/make-narration.py` | 由 brief 生成旁白（edge-tts）并写回真实时长 |
+| `scripts/make-bgm.py` | numpy 合成原创 BGM（确定性、可商用） |
+| `scripts/make-srt.py` | 生成零重叠 SRT 字幕 |
+| `scripts/_media.py` | ffmpeg 定位与时长探测 |
+| `assets/styles/paper-editorial.json` | 纸感编辑风风格模板 |
+| `assets/example-memory-brief.json` | 5 幕示例 brief（记忆为什么会被改写，68 秒） |
+| `template/src/` | Remotion 工程模板：kit（tokens/动效/后期）+ 幕组件 + Root |
+
+## 成品化管线（可选）
+
+只想要文本交付时可以跳过；要出成片时按这条走，实测 68 秒 1080p 约 6 分钟、现金 0 元。
+
+```bash
+bash scripts/bootstrap-remotion.sh my-video && cd my-video
+cp -r ../template/src/kit ../template/src/scenes src/ && cp ../template/src/Root.tsx src/Root.tsx
+mkdir -p styles && cp ../assets/styles/*.json styles/
+python -m pip install edge-tts
+
+cp ../assets/example-memory-brief.json video-brief.json
+python ../scripts/make-narration.py --project . --update-brief   # 旁白决定镜头长度
+python ../scripts/make-bgm.py --project .                        # 原创 BGM
+npx remotion still KnowledgeVideo out/check.png --frame=300 --scale=0.5
+npx remotion render KnowledgeVideo out/v.mp4 --concurrency=6 --crf=19
+python ../scripts/make-srt.py --project .
+```
+
+完整步骤、归一化命令与交付前自检见 `references/production-workflow.md`。
 
 ## 环境要求
 
@@ -74,6 +106,7 @@ npm run dev
 - npm / npx
 - 支持 Agent Skills 的 Coding Agent
 - 本地视频渲染需要 Remotion 支持的系统环境
+- 成品化管线额外需要：Python 3.9+、`numpy`、`edge-tts`（免费 TTS，无需 API Key）
 
 ## 注意事项
 

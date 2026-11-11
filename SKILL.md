@@ -49,6 +49,21 @@ For a single continuous protagonist, instantiate the subject once outside scene-
 
 Use a dark editorial background, one bright accent color, restrained glow, large Chinese typography, thin grid lines, and purposeful motion. Avoid excessive particles, card grids, random gradients, fake 3D, and constant camera movement. Let the concept determine the animation.
 
+## Style tokens
+
+When a style template is available (`styles/<id>.json`, see `references/style-templates.md`), treat it as the single source of visual truth: palette, type scale, motion curves, post-effect strength, caption rules and layout anchors all come from the token file. Do not hardcode colors or easing inside scene components, and do not exceed three colors or the declared overshoot limit.
+
+Keep the production rules that make coded video look finished: a deterministic post layer (grain ≈4–5%, vignette ≈0.3, bloom ≈0.1), deterministic noise seeds so renders are reproducible, motion curves instead of linear, and captions of at most 22 characters over two lines.
+
+## Production pipeline (optional)
+
+Text deliverables alone are a valid outcome. When the user wants a finished episode, `references/production-workflow.md` covers the full path: brief → narration (free edge-tts) → timing → BGM (synthesized, deterministic) → stills review → render → loudness/color normalization → SRT.
+
+Two rules matter most:
+
+- **Narration decides scene length.** Synthesize first, measure with ffprobe, write real durations back into `narration-timing.json` (and the brief with `--update-brief`). Never fix a duration first and cut the voice-over to fit it.
+- **Review stills before rendering the whole video.** A still costs seconds, a full render costs minutes.
+
 ## Commands
 
 ```bash
@@ -57,6 +72,10 @@ npx remotion render FullVideo out/review-frames --frames=0,450,900,1350,1800,225
 npx remotion render FullVideo out/final.mp4
 python3 scripts/generate-light-science-music.py --duration 90 --output public/audio/light-science-music.wav
 bash scripts/finalize-video.sh out/final.mp4 out/final-compatible.mp4
+
+python scripts/make-narration.py --project . --update-brief
+python scripts/make-bgm.py --project .
+python scripts/make-srt.py --project .
 ```
 
 On Windows, pass composition props using a JSON file rather than inline shell JSON.

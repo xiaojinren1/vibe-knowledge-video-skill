@@ -1,0 +1,114 @@
+{
+  "title": "记忆为什么会被改写",
+  "audience": "普通成年人",
+  "language": "zh-CN",
+  "durationSeconds": 68.46,
+  "aspectRatio": "16:9",
+  "fps": 30,
+  "visualStyle": {
+    "template": "assets/styles/paper-editorial.json",
+    "background": "#F2EDE3",
+    "foreground": "#1C1814",
+    "accent": "#B23A2F",
+    "mood": "纸感、编辑排版、克制、有年代感"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "title": "你的记忆里，没有一件事是原样保存的",
+      "startSeconds": 0,
+      "durationSeconds": 8.17,
+      "narration": "你以为记忆是一段录像。其实每一次回想，都是一次重新拼装。",
+      "onScreenText": "你的记忆里 / 没有一件事 / 是原样保存的",
+      "visual": "纸面三行宋体大字逐一裁切显现，右上朱红印章「重建」落章",
+      "claims": ["claim-001"]
+    },
+    {
+      "id": "schema",
+      "title": "1932 · 图式改写",
+      "startSeconds": 8.17,
+      "durationSeconds": 16.32,
+      "narration": "一九三二年，巴特利特让英国读者复述一段北美原住民的鬼故事。几次复述之后，独木舟变成了船，幽灵变成了梦。陌生的情节，被改写成他们熟悉的样子。",
+      "onScreenText": "陌生的故事 / 会被复述成熟悉的样子",
+      "visual": "左侧论点两行宋体；右侧三张纸卡片（初读 / 第二次 / 第五次）依次落下，各带偏移进度条",
+      "claims": ["claim-002"]
+    },
+    {
+      "id": "question",
+      "title": "1974 · 提问方式改写记忆",
+      "startSeconds": 24.49,
+      "durationSeconds": 20.52,
+      "narration": "一九七四年，洛夫特斯只换了一个动词。同一场车祸，听到撞碎的那一组，把车速估到四十点八英里；听到撞上的，只有三十四。一周后再问，撞碎组有更多人记得现场有碎玻璃。现场其实没有。",
+      "onScreenText": "换一个动词 / 就能换掉一段记忆",
+      "visual": "两条对比条随数值生长，末端用虚线对齐差值；右侧「你看到碎玻璃了吗」追问",
+      "claims": ["claim-003", "claim-004"]
+    },
+    {
+      "id": "reconsolidation",
+      "title": "机制 · 再巩固",
+      "startSeconds": 45.01,
+      "durationSeconds": 16.47,
+      "narration": "原因是再巩固。记忆被取出的那几分钟里，它不再稳固，可以补进新的细节，也可以被别人版本覆盖。重新固化之后，你得到的不是原件，是这一次的版本。",
+      "onScreenText": "每次回忆，都是一次 / 拆开重写",
+      "visual": "时间轴四次回忆，每段标「不稳定窗口」，偏差曲线随次数上扬并标注「这一次的版本 · 不是原件」",
+      "claims": ["claim-005"]
+    },
+    {
+      "id": "ending",
+      "title": "我记得，不等于它发生过",
+      "startSeconds": 61.48,
+      "durationSeconds": 6.98,
+      "holdSeconds": 2.4,
+      "narration": "所以，我记得，不等于它发生过。",
+      "onScreenText": "「我记得」 / 不等于它发生过",
+      "visual": "两行大字 + 一条朱红细线 + 印章「改写」，底部留下一期钩子",
+      "claims": []
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-001",
+      "text": "回忆是重建过程而非回放录像，会随当下目标重新拼装",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Reconstructive_memory",
+      "sourceTitle": "Reconstructive memory",
+      "sourceDate": "2026-11-10",
+      "status": "verified"
+    },
+    {
+      "id": "claim-002",
+      "text": "巴特利特 1932 年用《幽灵的战争》发现复述会向被试自身的文化图式收敛",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Schema_(psychology)",
+      "sourceTitle": "Bartlett (1932), Remembering: A Study in Experimental and Social Psychology",
+      "sourceDate": "1932",
+      "status": "verified"
+    },
+    {
+      "id": "claim-003",
+      "text": "Loftus & Palmer 1974：动词 smashed 组把车速估为 40.8 mph，hit 组为 34.0 mph",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Loftus_and_Palmer_(1974)_study",
+      "sourceTitle": "Reconstruction of automobile destruction",
+      "sourceDate": "1974",
+      "status": "verified"
+    },
+    {
+      "id": "claim-004",
+      "text": "一周后追问碎玻璃时，smashed 组更可能报告看到并不存在的碎玻璃",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Loftus_and_Palmer_(1974)_study",
+      "sourceTitle": "Reconstruction of automobile destruction",
+      "sourceDate": "1974",
+      "status": "verified"
+    },
+    {
+      "id": "claim-005",
+      "text": "记忆提取后进入不稳定状态，需重新固化，期间可被修改（再巩固）",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Memory_consolidation#Reconsolidation",
+      "sourceTitle": "Nader, Schafe & LeDoux (2000), Fear memories require protein synthesis in the amygdala for reconsolidation",
+      "sourceDate": "2000",
+      "status": "verified"
+    }
+  ],
+  "audio": {
+    "narrationFile": "public/audio/narr-<scene-id>.mp3",
+    "musicFile": "public/audio/bgm.wav"
+  }
+}

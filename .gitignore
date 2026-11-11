@@ -1,9 +1,18 @@
 node_modules/
 out/
 .DS_Store
+Thumbs.db
 *.mp4
 *.mov
 *.webm
 .env
 .env.*
 !.env.example
+
+# Python
+__pycache__/
+*.pyc
+
+# 成品化管线生成物（脚本可重建）
+public/audio/
+*.wav
