@@ -79,16 +79,82 @@ def soft_limit(x: np.ndarray, ceiling: float, attack_ms: float = 6.0, release_ms
     return x * smooth[:, None]
 
 
+def lowpass_mono(x: np.ndarray, cutoff: float, sr: int = 48000, poles: int = 2) -> np.ndarray:
+    a = np.exp(-2 * np.pi * cutoff / sr)
+    y = x
+    for _ in range(poles):
+        out = np.empty_like(y)
+        acc = 0.0
+        for i in range(len(y)):
+            acc = (1 - a) * y[i] + a * acc
+            out[i] = acc
+        y = out
+    return y
+
+
+def envelope(x: np.ndarray, sr: int, attack_ms: float = 2.0, release_ms: float = 60.0) -> np.ndarray:
+    attack = float(np.exp(-1.0 / (attack_ms / 1000 * sr)))
+    release = float(np.exp(-1.0 / (release_ms / 1000 * sr)))
+    out = np.empty_like(x)
+    env = 0.0
+    for i, v in enumerate(np.abs(x)):
+        coef = attack if v > env else release
+        env = coef * env + (1 - coef) * v
+        out[i] = env
+    return out
+
+
+def deess(x: np.ndarray, sr: int = 48000, cutoff: float = 4200.0, max_reduction_db: float = -9.0) -> np.ndarray:
+    """齿音抑制：只压 4.2kHz 以上的瞬态，正常语音的高频不动。
+
+    之所以需要它：TTS 的 s/x/sh 音在 +8dB 增益后会扎耳，静态高切会把清晰度也削掉。
+    """
+    mono = x.mean(axis=1)
+    band_mono = mono - lowpass_mono(mono, cutoff, sr)
+    env = envelope(band_mono, sr)
+    level_db = 20 * np.log10(env + 1e-9)
+    active = level_db > (np.percentile(level_db, 50) - 30)
+    thr_db = np.percentile(level_db[active], 88) if active.any() else -20.0
+    reduction_db = np.clip(thr_db - level_db, max_reduction_db, 0.0)
+    gain = 10 ** (reduction_db / 20)
+    # 平滑增益，避免"抽气"
+    box = np.ones(int(0.004 * sr)) / max(1, int(0.004 * sr))
+    gain = np.convolve(gain, box, mode="same")
+
+    out = np.empty_like(x)
+    for ch in range(x.shape[1]):
+        band = x[:, ch] - lowpass_mono(x[:, ch], cutoff, sr)
+        out[:, ch] = x[:, ch] - band + band * gain
+    return out, float(np.abs(reduction_db).max()), thr_db
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
     ap.add_argument("--output", required=True)
     ap.add_argument("--gain-db", type=float, required=True, help="-16 减去实测 input_i")
     ap.add_argument("--ceiling-dbtp", type=float, default=-1.5)
-    ap.add_argument("--residual-gain", action="store_true", help="限幅后按需回补少量增益（默认关闭）")
+    ap.add_argument("--no-deess", action="store_true", help="关闭齿音抑制")
+    ap.add_argument("--deess-max-db", type=float, default=-10.0, help="齿音最多压多少 dB")
+    ap.add_argument("--high-shelf-db", type=float, default=-2.0, help="6kHz 以上静态收敛的 dB 数")
     args = ap.parse_args()
 
     data, sr = read_wav(args.input)
+
+    # 先做一档静态高频收敛（-2dB @6kHz 以上）：TTS 的齿音底座降一点，比纯动态更稳
+    if args.high_shelf_db != 0:
+        out_shelf = np.empty_like(data)
+        k = 1 - 10 ** (args.high_shelf_db / 20)
+        for ch in range(data.shape[1]):
+            band = data[:, ch] - lowpass_mono(data[:, ch], 6000, sr)
+            out_shelf[:, ch] = data[:, ch] - band * k
+        data = out_shelf
+        print(f"高频收敛 {args.high_shelf_db:+.1f} dB @6kHz")
+
+    if not args.no_deess:
+        data, max_red, thr = deess(data, sr, max_reduction_db=args.deess_max_db)
+        print(f"齿音抑制：阈值 {thr:.1f} dB，最大下压 {max_red:.1f} dB")
+
     gain = 10 ** (args.gain_db / 20)
     out = data * gain
 

@@ -13,6 +13,10 @@ export type Word = { text: string; start: number; end: number };
 const IGNORABLE = /[\s，。！？、；：,.!?;:"'“”‘’（）()[\]{}—–…·《》<>/\\|-]/g;
 const clean = (s: string) => s.replace(IGNORABLE, "");
 
+// 句尾不留句号/逗号：字幕惯例（问号、感叹号保留）
+const TRAILING = /[。，、；：,.;:\s　]+$/;
+const stripTail = (s: string) => s.replace(TRAILING, "").trim();
+
 const splitChunks = (text: string, limit: number): string[] => {
   const out: string[] = [];
   const sentences = text.split(/(?<=[。！？!?])/).map((s) => s.trim()).filter(Boolean);
@@ -55,7 +59,7 @@ const cuesFromWords = (text: string, chunks: string[], words: Word[], leadIn: nu
     const from = leadIn + spans[Math.min(cursor, spans.length - 1)][0];
     cursor += n;
     const to = leadIn + spans[Math.min(cursor, spans.length) - 1][1];
-    cues.push({ text: chunk.trim(), from, to });
+    cues.push({ text: stripTail(chunk), from, to });
   }
   return cues;
 };
@@ -66,7 +70,7 @@ const cuesProportional = (chunks: string[], audioSeconds: number, leadIn: number
   let cursor = leadIn;
   return chunks.map((chunk, i) => {
     const dur = (audioSeconds * weights[i]) / total;
-    const cue = { text: chunk.trim(), from: cursor, to: cursor + dur };
+    const cue = { text: stripTail(chunk), from: cursor, to: cursor + dur };
     cursor += dur;
     return cue;
   });

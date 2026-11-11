@@ -55,7 +55,11 @@ python ../scripts/make-bgm.py --project .            # 时长自动读 narration
 python ../scripts/make-srt.py --project .            # 生成 out/captions.srt（零重叠）
 ```
 
-BGM 是程序合成的 A 小调和弦垫 + 稀疏拨弦，固定种子，两次生成完全一致，可商用于自己的片子。
+BGM 是程序合成的「科普向」配乐：96 BPM、Am–F–C–G 铺底 + 每拍一个木琴拨奏 + 轻木质节拍，
+固定种子，两次生成完全一致，可商用。
+
+**全频段限带在 1.8kHz 以内**（双击低通）——高频是"刺耳"的唯一来源，宁可闷也不要扎耳；
+不用白噪做节奏（人耳立刻觉得脏），节拍改用 640Hz 的木质短音。
 
 ## 四、先看静帧，再渲全片
 
@@ -65,6 +69,13 @@ npx remotion render KnowledgeVideo out/v.mp4 --concurrency=6 --crf=19
 ```
 
 **纪律：先看图，再渲片。** 静帧 3–6 秒一张，全片 5–6 分钟；用静帧抓版面问题，比渲完再发现问题省一个数量级的时间。
+
+## 四·五、字幕排版惯例
+
+- **句末不加句号/逗号**：`make-srt.py` 与 `Captions.tsx` 都会剥掉句尾的 `。，、；：`；
+  问号、感叹号保留（它们承载语气）
+- 每屏 ≤ 22 字、至多两行；长句按句读切，不要按字数硬切
+- 句尾标点是"字幕感"最明显的破绽：一屏里满是句号，看起来像文档而不是台词
 
 ## 五、响度归一化（不要用单遍 loudnorm）
 
@@ -80,15 +91,23 @@ $FF -y -i out/v.mp4 -map 0:a -f wav out/_mix.wav
 # 2) 量出实测响度（只取 input_i，输出文件用完即删）
 $FF -i out/_mix.wav -af "loudnorm=I=-16:TP=-1.5:print_format=json" -f wav out/_probe.wav 2>&1 | grep input_i
 
-# 3) 静态增益 + 前视软限幅（gain = -16 减去上一步的 input_i）
-python ../scripts/master-audio.py --input out/_mix.wav --output out/_master.wav --gain-db 8.2
+# 3) 高频收敛 + 齿音抑制 + 静态增益 + 前视软限幅
+#    （gain = -16 减去上一步的 input_i）
+python ../scripts/master-audio.py --input out/_mix.wav --output out/_master.wav --gain-db 8.3
 
 # 4) 换轨并统一编码参数
 $FF -y -i out/v.mp4 -i out/_master.wav -map 0:v -map 1:a   -vf "scale=in_range=full:out_range=tv"   -c:v libx264 -profile:v high -pix_fmt yuv420p -color_range tv   -colorspace bt709 -color_primaries bt709 -color_trc bt709 -crf 20   -c:a aac -b:a 192k -ar 48000 -ac 2 -shortest -movflags +faststart out/final.mp4
 ```
 
+`master-audio.py` 内部做三件事：
+
+1. **6kHz 以上静态收敛 −2dB**：把 TTS 齿音的底座整体降一点
+2. **动态齿音抑制**：只在 4.2kHz 以上的瞬态超过阈值时下压（上限 −10dB），正常语音不受影响
+3. **静态增益 + 前视软限幅**：只压峰值，不做动态归一
+
 实测效果（94.8 秒片）：单遍 loudnorm 得到 dynamic 归一化、安静段抬噪；
-换成静态增益 +8.24 dB 再软限幅后，**I = −16.6 LUFS，TP = −1.4 dBTP，LRA 4.9**，全程无动态处理。
+改造后 **I = −16.7 LUFS，TP = −1.5 dBTP，LRA 4.5**；
+原先最刺耳的几处（54.0s / 76.1s / 31.6s）4–9kHz 能量下降 **1.9–4.7 dB**，整体电平只变化 ±0.4 dB。
 
 ## 六、交付前自检（照做，不要凭感觉）
 

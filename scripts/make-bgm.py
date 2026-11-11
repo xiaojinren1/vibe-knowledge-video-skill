@@ -1,16 +1,14 @@
 #!/usr/bin/env python
-"""生成一段原创、确定性、可商用的 BGM（纯 numpy 合成，不用任何素材库）。
+"""生成原创、确定性、可商用的 BGM（纯 numpy 合成，不用任何素材库）。
 
-用法：
-    python scripts/make-bgm.py --project ./my-video --duration 70
-    python scripts/make-bgm.py --project ./my-video            # 时长自动读 narration-timing.json
+风格：科普 / 解释类视频常用的「温暖铺底 + 木琴拨奏 + 轻木质节拍」，中速、不抢人声。
 
-声音设计要点（都是踩过的坑）：
-- 不做高频点缀：尖锐的拨弦在旁白底下会变成「刺耳的杂音」，宁愿无聊也不要刺耳
-- 不用白噪/粉噪当底噪：那是「沙沙声」的来源，人耳会立刻觉得脏
-- 低端切掉 80Hz 以下：笔记本/手机喇叭放不出来，只会糊成一片嗡声
-- 正弦垫音加二次/三次谐波与轻微失谐：纯正弦像风琴，听起来「怪」
-- 音量压得很低（峰值 ~0.4），给旁白让位
+声音设计上的硬约束（都是踩过的坑）：
+- 全频段限带在 ~1.6kHz 以内（双击低通）：高频是"刺耳"的唯一来源，宁可闷也不要扎耳
+- 不用白噪 / 粉噪：人耳立刻觉得脏；需要节奏就用木质短音，不用噪声
+- 拨奏起音 20ms、衰减 0.5s：太快的起音在耳机上就是"啪"的一声
+- 低频切 70Hz 以下：手机喇叭放不出来，只会糊
+- 峰值压到 0.38，混音时再乘 0.22，保证永远在旁白之下
 """
 import argparse
 import json
@@ -37,18 +35,22 @@ def adsr(n: int, a: float, d: float, s: float, r: float, sr: int = SR) -> np.nda
     return env[:n] if len(env) >= n else np.pad(env, (0, n - len(env)))
 
 
-def lowpass(x: np.ndarray, cutoff: float, sr: int = SR) -> np.ndarray:
+def lowpass(x: np.ndarray, cutoff: float, sr: int = SR, poles: int = 2) -> np.ndarray:
+    """一阶 IIR 级联出更陡的滚降，避免高频从滤波器缝里漏出来。"""
     a = math.exp(-2 * math.pi * cutoff / sr)
-    y = np.empty_like(x)
-    acc = 0.0
-    for i in range(len(x)):
-        acc = (1 - a) * x[i] + a * acc
-        y[i] = acc
+    y = x
+    for _ in range(poles):
+        out = np.empty_like(y)
+        acc = 0.0
+        for i in range(len(y)):
+            acc = (1 - a) * y[i] + a * acc
+            out[i] = acc
+        y = out
     return y
 
 
 def highpass(x: np.ndarray, cutoff: float, sr: int = SR) -> np.ndarray:
-    return x - lowpass(x, cutoff, sr)
+    return x - lowpass(x, cutoff, sr, poles=1)
 
 
 def hz(semitones_from_a4: float) -> float:
@@ -60,7 +62,7 @@ def main() -> None:
     ap.add_argument("--project", default=".", help="Remotion 工程目录")
     ap.add_argument("--duration", type=float, default=None, help="默认读 narration-timing.json 的总时长 +2s")
     ap.add_argument("--output", default=None, help="默认 <project>/public/audio/bgm.wav")
-    ap.add_argument("--seed", type=int, default=20261110, help="固定种子，保证两次生成完全一致")
+    ap.add_argument("--seed", type=int, default=20261110)
     args = ap.parse_args()
 
     project = os.path.abspath(args.project)
@@ -75,73 +77,92 @@ def main() -> None:
 
     rng = np.random.default_rng(args.seed)
     n = int(duration * SR)
+    t_all = np.arange(n) / SR
     pad = np.zeros(n)
-    bells = np.zeros(n)
+    pluck = np.zeros(n)
+    wood = np.zeros(n)
 
-    # A 小调铺底：Am9 – Fmaj7 – Cmaj7 – Gsus，每 8 秒换一次
+    bpm = 96.0
+    beat = 60.0 / bpm           # 0.625s
+    bar = beat * 4              # 2.5s
+
+    # Am – F – C – G，每个和弦 2 小节（5 秒）
     chords = [
-        [hz(-12), hz(-5), hz(0), hz(3)],
-        [hz(-16), hz(-9), hz(-4), hz(0)],
-        [hz(-21), hz(-9), hz(-2), hz(3)],
-        [hz(-14), hz(-7), hz(0), hz(5)],
+        [hz(-12), hz(-5), hz(0), hz(3)],    # A2 E3 A3 C4
+        [hz(-16), hz(-9), hz(-4), hz(3)],   # F2 F3 A3 C4
+        [hz(-21), hz(-9), hz(-2), hz(4)],   # C2 C3 D4 E4
+        [hz(-14), hz(-7), hz(2), hz(5)],    # G2 G3 D4 F4
     ]
-    bar = 8.0
-    for i, chord in enumerate(chords * 64):
-        start = i * bar
-        if start >= duration - 0.1:
+
+    total_bars = int(duration / bar) + 2
+    for b in range(total_bars):
+        chord = chords[(b // 2) % len(chords)]
+        start = b * bar
+        if start >= duration:
             break
-        seg_len = min(bar + 1.6, duration - start)
-        idx0 = int(start * SR)
-        idx1 = min(n, int((start + seg_len) * SR))
-        tt = np.arange(idx1 - idx0) / SR
-        seg = np.zeros(idx1 - idx0)
-        for k, f in enumerate(chord):
-            detune = 1.0 + 0.0015 * (1 if k % 2 else -1)
-            seg += np.sin(2 * math.pi * f * detune * tt) * (0.8 - 0.12 * k)
-            seg += 0.30 * np.sin(2 * math.pi * f * 2 * detune * tt) * (0.8 - 0.12 * k)
-            seg += 0.10 * np.sin(2 * math.pi * f * 3 * detune * tt) * (0.8 - 0.12 * k)
-        seg *= adsr(len(seg), 2.2, 1.6, 0.8, 2.0)
-        pad[idx0:idx1] += seg * 0.10
-
-    # 极慢的呼吸感（0.05Hz），避免长音听成"电流声"
-    pad *= 1.0 + 0.08 * np.sin(2 * math.pi * 0.05 * np.arange(n) / SR)
-
-    # 低频清理后总体柔化：切掉 80Hz 以下、5kHz 以上
-    pad = highpass(pad, 80)
-    pad = lowpass(pad, 5000)
-
-    # 稀疏钟琴：每 4 秒一个，落在 A 小调五声音阶，起音慢、尾巴长、限带 2.4kHz
-    pentatonic = [hz(x) for x in (0, 3, 5, 7, 10, 12)]
-    for i in range(int(duration / 4) + 1):
-        start = i * 4.0 + 1.1
-        if start >= duration - 2:
-            break
-        freq = pentatonic[int(rng.integers(0, len(pentatonic)))]
-        idx0 = int(start * SR)
-        idx1 = min(n, int((start + 2.4) * SR))
-        if idx1 <= idx0:
+        dur = min(bar + 0.8, duration - start)
+        i0, i1 = int(start * SR), min(n, int((start + dur) * SR))
+        if i1 <= i0:
             continue
-        tt = np.arange(idx1 - idx0) / SR
-        env = adsr(idx1 - idx0, 0.06, 0.5, 0.0, 1.8)
-        tone = (np.sin(2 * math.pi * freq * tt) + 0.22 * np.sin(2 * math.pi * freq * 2 * tt)) * env
-        bells[idx0:idx1] += tone * 0.022
-    bells = lowpass(bells, 2400)
+        tt = np.arange(i1 - i0) / SR
+        seg = np.zeros(i1 - i0)
+        for k, f in enumerate(chord):
+            seg += (0.7 - 0.1 * k) * np.sin(2 * math.pi * f * tt)
+            seg += (0.18 - 0.03 * k) * np.sin(2 * math.pi * f * 2 * tt)
+        seg *= adsr(len(seg), 1.2, 0.8, 0.75, 1.0)
+        pad[i0:i1] += seg * 0.085
 
-    mix = pad + bells
+        # 木琴拨奏：每拍一个音，取和弦音 + 高八度，音量随机 ±1.5dB
+        for beat_i in range(4):
+            for half in (0.0, 0.5):
+                pos = start + (beat_i + half) * beat
+                if pos >= duration - 0.4:
+                    continue
+                f = chord[int(rng.integers(0, len(chord)))] * (2 if rng.random() < 0.35 else 1)
+                j0 = int(pos * SR)
+                j1 = min(n, int((pos + 0.7) * SR))
+                if j1 <= j0:
+                    continue
+                tt2 = np.arange(j1 - j0) / SR
+                tone = np.sin(2 * math.pi * f * tt2) + 0.22 * np.sin(2 * math.pi * f * 2 * tt2)
+                tone *= adsr(len(tone), 0.02, 0.18, 0.0, 0.5)
+                pluck[j0:j1] += tone * (0.020 if half == 0 else 0.013)
 
-    # 12ms 立体声展宽（钟琴略有左右差）
-    delay = int(0.012 * SR)
-    left = mix
-    right = np.concatenate([np.zeros(delay), mix[:-delay]])
-    stereo = np.stack([left, right], axis=1)
+        # 木质节拍：第 2、4 拍
+        for beat_i in (1, 3):
+            pos = start + beat_i * beat
+            if pos >= duration - 0.2:
+                continue
+            j0 = int(pos * SR)
+            j1 = min(n, int((pos + 0.09) * SR))
+            if j1 <= j0:
+                continue
+            tt3 = np.arange(j1 - j0) / SR
+            tone = np.sin(2 * math.pi * 640 * tt3) + 0.3 * np.sin(2 * math.pi * 960 * tt3)
+            tone *= adsr(len(tone), 0.004, 0.03, 0.0, 0.05)
+            wood[j0:j1] += tone * 0.010
 
-    fade_in = int(2.5 * SR)
-    fade_out = int(3.5 * SR)
+    # 统一限带：pad 1.4k、拨奏 1.8k、木质 1.6k（双击低通，避免高频泄漏）
+    pad = lowpass(pad, 1400)
+    pluck = lowpass(pluck, 1800)
+    wood = lowpass(wood, 1600)
+
+    mix = pad + pluck + wood
+    mix = highpass(mix, 70)
+
+    # 轻微呼吸（0.08Hz），避免长音听成电流声
+    mix *= 1.0 + 0.05 * np.sin(2 * math.pi * 0.08 * t_all)
+
+    delay = int(0.011 * SR)
+    stereo = np.stack([mix, np.concatenate([np.zeros(delay), mix[:-delay]])], axis=1)
+
+    fade_in = int(2.0 * SR)
+    fade_out = int(3.0 * SR)
     stereo[:fade_in] *= np.linspace(0, 1, fade_in)[:, None]
     stereo[-fade_out:] *= np.linspace(1, 0, fade_out)[:, None]
 
     peak = np.max(np.abs(stereo))
-    stereo = stereo / max(peak, 1e-9) * 0.40
+    stereo = stereo / max(peak, 1e-9) * 0.38
     pcm = (stereo * 32767).astype(np.int16)
 
     with wave.open(output, "wb") as w:
@@ -149,7 +170,7 @@ def main() -> None:
         w.setsampwidth(2)
         w.setframerate(SR)
         w.writeframes(pcm.tobytes())
-    print(f"wrote {output}  {duration}s  peak 0.40")
+    print(f"wrote {output}  {duration}s  bpm {bpm:.0f}  peak 0.38")
 
 
 if __name__ == "__main__":

@@ -74,7 +74,7 @@ def cues_from_words(narration: str, chunks, words, lead_in: float, limit_gap: fl
         start = lead_in + spans[min(cursor, len(spans) - 1)][0]
         cursor += n
         end = lead_in + spans[min(cursor, len(spans)) - 1][1]
-        cues.append([start, end, chunk.strip()])
+        cues.append([start, end, strip_tail(chunk)])
     return cues
 
 
@@ -84,10 +84,18 @@ def cues_proportional(narration: str, chunks, audio_seconds: float, lead_in: flo
     cues, acc, cursor = [], 0, lead_in
     for chunk, w in zip(chunks, weights):
         dur = audio_seconds * w / total
-        cues.append([cursor, cursor + dur, chunk.strip()])
+        cues.append([cursor, cursor + dur, strip_tail(chunk)])
         cursor += dur
         acc += w
     return cues
+
+
+# 句尾这些符号不显示：字幕惯例是句末不加句号/逗号，只保留问号感叹号
+TRAILING = "。，、；：,.;: 　"
+
+
+def strip_tail(text: str) -> str:
+    return text.strip().rstrip(TRAILING).strip()
 
 
 def ts(t: float) -> str:
