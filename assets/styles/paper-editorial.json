@@ -19,12 +19,48 @@
     "rule": "rgba(28,24,20,0.28)"
   },
   "typography": {
-    "display": { "family": "serif", "size": 122, "weight": 700, "leading": 1.28, "track": "0.02em" },
-    "h1": { "family": "serif", "size": 74, "weight": 700, "leading": 1.4, "track": "0.02em" },
-    "h2": { "family": "serif", "size": 44, "weight": 700, "leading": 1.5, "track": "0.02em" },
-    "body": { "family": "serif", "size": 33, "weight": 500, "leading": 1.75, "track": "0.02em" },
-    "caption": { "family": "serif", "size": 36, "weight": 700, "leading": 1.5, "track": "0.02em" },
-    "kicker": { "family": "mono", "size": 22, "weight": 500, "leading": 1.2, "track": "0.24em" }
+    "display": {
+      "family": "serif",
+      "size": 122,
+      "weight": 700,
+      "leading": 1.28,
+      "track": "0.02em"
+    },
+    "h1": {
+      "family": "serif",
+      "size": 74,
+      "weight": 700,
+      "leading": 1.4,
+      "track": "0.02em"
+    },
+    "h2": {
+      "family": "serif",
+      "size": 44,
+      "weight": 700,
+      "leading": 1.5,
+      "track": "0.02em"
+    },
+    "body": {
+      "family": "serif",
+      "size": 33,
+      "weight": 500,
+      "leading": 1.75,
+      "track": "0.02em"
+    },
+    "caption": {
+      "family": "serif",
+      "size": 36,
+      "weight": 700,
+      "leading": 1.5,
+      "track": "0.02em"
+    },
+    "kicker": {
+      "family": "mono",
+      "size": 22,
+      "weight": 500,
+      "leading": 1.2,
+      "track": "0.24em"
+    }
   },
   "fonts": {
     "serif": "\"Source Han Serif SC\", \"Noto Serif SC\", \"SimSun\", serif",
@@ -32,12 +68,44 @@
     "mono": "\"Cascadia Mono\", \"Consolas\", ui-monospace, monospace"
   },
   "motion": {
-    "reveal": { "type": "clip-rise", "duration": 30, "distance": 18, "curve": [0.16, 1, 0.3, 1] },
-    "standard": { "curve": [0.2, 0.8, 0.2, 1] },
-    "exit": { "curve": [0.4, 0, 1, 1] },
+    "reveal": {
+      "type": "clip-rise",
+      "duration": 30,
+      "distance": 18,
+      "curve": [
+        0.16,
+        1,
+        0.3,
+        1
+      ]
+    },
+    "standard": {
+      "curve": [
+        0.2,
+        0.8,
+        0.2,
+        1
+      ]
+    },
+    "exit": {
+      "curve": [
+        0.4,
+        0,
+        1,
+        1
+      ]
+    },
     "stagger": 5,
-    "springSoft": { "damping": 200, "mass": 0.6, "stiffness": 90 },
-    "springSnap": { "damping": 24, "mass": 0.5, "stiffness": 220 },
+    "springSoft": {
+      "damping": 200,
+      "mass": 0.6,
+      "stiffness": 90
+    },
+    "springSnap": {
+      "damping": 24,
+      "mass": 0.5,
+      "stiffness": 220
+    },
     "maxOvershoot": 1.06
   },
   "postEffects": {
@@ -48,7 +116,7 @@
     "paperTexture": 0.13
   },
   "audio": {
-    "bgmVolume": 0.34,
+    "bgmVolume": 0.22,
     "narrationTail": 0.55,
     "bgmFadeIn": 2.0,
     "bgmFadeOut": 2.5,
@@ -64,10 +132,25 @@
     "leadIn": 0.55
   },
   "layout": {
-    "header": { "left": 140, "top": 96 },
-    "rule": { "left": 140, "right": 140, "top": 150 },
-    "footer": { "left": 140, "bottom": 74 },
-    "seal": { "size": 148, "right": 168, "top": 210, "rotate": -3 }
+    "header": {
+      "left": 140,
+      "top": 96
+    },
+    "rule": {
+      "left": 140,
+      "right": 140,
+      "top": 150
+    },
+    "footer": {
+      "left": 140,
+      "bottom": 74
+    },
+    "seal": {
+      "size": 148,
+      "right": 168,
+      "top": 210,
+      "rotate": -3
+    }
   },
   "roadmap": {
     "note": "同一套 token 结构可承载其他风格；新增风格只加一个 JSON，不改组件。",

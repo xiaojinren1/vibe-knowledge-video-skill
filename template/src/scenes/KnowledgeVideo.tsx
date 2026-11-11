@@ -2,8 +2,9 @@ import React from "react";
 import { AbsoluteFill, Audio, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import timing from "../../narration-timing.json";
 import { ClipReveal, cubicBezier } from "../kit/anim";
-import { audio as audioTok, captions as capTok, font, palette, post } from "../kit/tokens";
+import { audio as audioTok, font, palette, post } from "../kit/tokens";
 import { PaperTexture, PostFX } from "../kit/PostFX";
+import { Captions, type Word } from "../kit/Captions";
 
 /* ---------- 通用 ---------- */
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -14,77 +15,6 @@ const T = Object.fromEntries(timing.scenes.map((s) => [s.id, s])) as Record<
   string,
   { id: string; text: string; audioSeconds: number; seconds: number }
 >;
-
-/* ---------- 字幕：按句切块，按字数分配时间 ---------- */
-const splitChunks = (text: string): string[] => {
-  const parts = text.split(/(?<=[。！？])/).map((s) => s.trim()).filter(Boolean);
-  const out: string[] = [];
-  for (const p of parts) {
-    if (p.length <= capTok.maxCharsPerCue) out.push(p);
-    else {
-      // 长句按逗号再切，保证每屏 ≤ 22 字
-      let buf = "";
-      for (const seg of p.split(/(?<=[，、；])/)) {
-        if ((buf + seg).length > capTok.maxCharsPerCue && buf) {
-          out.push(buf);
-          buf = seg;
-        } else buf += seg;
-      }
-      if (buf) out.push(buf);
-    }
-  }
-  return out;
-};
-
-const Captions: React.FC<{ text: string; audioSeconds: number; sceneSeconds: number }> = ({ text, audioSeconds, sceneSeconds }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const chunks = splitChunks(text);
-  const totalChars = chunks.reduce((n, c) => n + c.length, 0) || 1;
-  const start = capTok.leadIn * fps;
-  const span = Math.max(1, audioSeconds * fps);
-  let acc = 0;
-  const cues = chunks.map((c) => {
-    const from = start + (acc / totalChars) * span;
-    acc += c.length;
-    const to = start + (acc / totalChars) * span;
-    return { text: c, from, to };
-  });
-  const active = cues.find((c) => frame >= c.from && frame < c.to + 0.35 * fps);
-  if (!active) return null;
-  const p = prog(frame, active.from, 12);
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: capTok.bottom,
-        display: "flex",
-        justifyContent: "center",
-        opacity: p * 0.92,
-        transform: `translateY(${(1 - p) * 8}px)`,
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1320,
-          padding: "14px 30px",
-          background: capTok.backdrop,
-          borderRadius: 3,
-          fontFamily: font.serif,
-          fontSize: 36,
-          lineHeight: 1.5,
-          letterSpacing: "0.02em",
-          color: palette.bInk,
-          textAlign: "center",
-        }}
-      >
-        {active.text}
-      </div>
-    </div>
-  );
-};
 
 /* ---------- 版式零件 ---------- */
 const PageHeader: React.FC<{ index: string; title: string; delay?: number }> = ({ index, title, delay = 8 }) => (
@@ -212,7 +142,7 @@ const Scene: React.FC<{ id: string; children: React.ReactNode; captions?: boolea
       {children}
       {footer ? <Footer note={footer} delay={20} /> : null}
       {source ? <SourceNote text={source} delay={26} /> : null}
-      {captions ? <Captions text={t.text} audioSeconds={t.audioSeconds} sceneSeconds={t.seconds} /> : null}
+      {captions ? <Captions text={t.text} audioSeconds={t.audioSeconds} words={(t as { words?: Word[] }).words} /> : null}
       <Audio src={staticFile(`audio/narr-${id}.mp3`)} />
     </AbsoluteFill>
   );

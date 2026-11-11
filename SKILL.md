@@ -63,6 +63,8 @@ Two rules matter most:
 
 - **Narration decides scene length.** Synthesize first, measure with ffprobe, write real durations back into `narration-timing.json` (and the brief with `--update-brief`). Never fix a duration first and cut the voice-over to fit it.
 - **Review stills before rendering the whole video.** A still costs seconds, a full render costs minutes.
+- **Captions follow word-level boundaries, not character proportions.** Ask edge-tts for `boundary="WordBoundary"` and store `words` in `narration-timing.json`; proportional allocation lags by ~0.5s on average.
+- **Normalize loudness with static gain plus a soft limiter, not single-pass `loudnorm`.** A single pass runs in dynamic mode and lifts the noise floor in quiet passages; measure `input_i` first, then apply gain and limit peaks to −1.5 dBTP.
 
 ## Commands
 

@@ -51,8 +51,27 @@ async def main() -> None:
         if not text.strip():
             raise SystemExit(f"scene {sid} 缺少 narration")
         audio_path = os.path.join(out_dir, f"narr-{sid}.mp3")
-        comm = edge_tts.Communicate(text, args.voice, rate=args.rate, pitch=args.pitch)
-        await comm.save(audio_path)
+        try:
+            comm = edge_tts.Communicate(
+                text, args.voice, rate=args.rate, pitch=args.pitch, boundary="WordBoundary"
+            )
+        except TypeError:
+            # 老版本 edge-tts 没有 boundary 参数，退化为句级边界
+            comm = edge_tts.Communicate(text, args.voice, rate=args.rate, pitch=args.pitch)
+        words = []
+        with open(audio_path, "wb") as fh:
+            async for chunk in comm.stream():
+                if chunk["type"] == "audio":
+                    fh.write(chunk["data"])
+                elif chunk["type"] in ("WordBoundary", "SentenceBoundary"):
+                    # offset / duration 单位是 100 纳秒
+                    words.append(
+                        {
+                            "text": chunk["text"],
+                            "start": round(chunk["offset"] / 10_000_000, 3),
+                            "end": round((chunk["offset"] + chunk["duration"]) / 10_000_000, 3),
+                        }
+                    )
         audio_seconds = probe_duration(ffmpeg, audio_path)
         hold = float(scene.get("holdSeconds", args.tail))
         seconds = round(audio_seconds + hold, 2)
@@ -63,9 +82,11 @@ async def main() -> None:
                 "text": text,
                 "audioSeconds": round(audio_seconds, 2),
                 "seconds": seconds,
+                "words": words,
             }
         )
-        print(f"{sid:<24} 旁白 {audio_seconds:6.2f}s  镜头 {seconds:6.2f}s")
+        spoken = words[-1]["end"] if words else 0.0
+        print(f"{sid:<24} 旁白 {audio_seconds:6.2f}s（字级边界 {len(words)} 个，语音结束 {spoken:.2f}s）  镜头 {seconds:6.2f}s")
 
     timing["total"] = round(sum(s["seconds"] for s in timing["scenes"]), 2)
     with open(os.path.join(project, "narration-timing.json"), "w", encoding="utf-8") as f:
