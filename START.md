@@ -37,6 +37,17 @@ cd D:/studyAndWork/pi-demo
 cp -r ai-history <新slug>          # 不含 node_modules 也行，事后 mklink /J 指向 ai-history/node_modules
 ```
 
+## 建新工程：一条命令
+
+```bash
+bash scripts/new-project.sh <slug>                       # 默认最新 Remotion
+bash scripts/new-project.sh <slug> --example ai-history   # 带上示例 brief 与幕组件
+bash scripts/new-project.sh <slug> --pin 4.0.542          # 复现旧片时才锁版本
+```
+
+模板不绑定版本：**锁版本发生在每个工程自己的 `package.json` 里**，不在仓库里。
+升级前跑 `references/upgrading.md` 的四点检查；旧工程不动，回退成本为零。
+
 ## 标准流水线（四步，0 元现金）
 
 ```bash

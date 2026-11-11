@@ -61,6 +61,20 @@ BGM 是程序合成的「科普向」配乐：96 BPM、Am–F–C–G 铺底 + �
 **全频段限带在 1.8kHz 以内**（双击低通）——高频是"刺耳"的唯一来源，宁可闷也不要扎耳；
 不用白噪做节奏（人耳立刻觉得脏），节拍改用 640Hz 的木质短音。
 
+## 三·五、音频缺失时的行为
+
+`KnowledgeVideo` / 示例幕组件都用 `getStaticFiles()` 检查 `public/audio/` 里有没有对应文件：
+**没有就跳过 `<Audio>`，渲染仍能成功（无声片），不会报「Could not play audio」崩掉**。
+
+所以新工程可以「先渲一版看版式，再补声音」：
+
+```bash
+npx remotion render <CompositionId> out/preview.mp4 --concurrency=6   # 无声预览
+python ../scripts/make-narration.py --project . --update-brief
+python ../scripts/make-bgm.py --project .
+npx remotion render <CompositionId> out/v.mp4 --concurrency=6         # 带声音
+```
+
 ## 四、先看静帧，再渲全片
 
 ```bash

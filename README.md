@@ -66,7 +66,9 @@ npm run dev
 | 路径 | 用途 |
 |---|---|
 | `SKILL.md` | Skill 的完整执行流程与质量规则 |
-| `scripts/bootstrap-remotion.sh` | 创建 Remotion 空白项目并安装官方 Skills |
+| `scripts/new-project.sh` | **一键建工程**：脚手架 + 模板 + 风格 + 示例资产（默认最新版，`--pin` 可锁） |
+| `scripts/bootstrap-remotion.sh` | 只创建 Remotion 空白项目并安装官方 Skills（底层脚本） |
+| `references/upgrading.md` | 版本策略与升级四点检查 |
 | `scripts/validate-brief.mjs` | 校验视频 brief、场景和来源引用 |
 | `assets/example-video-brief.json` | 10 秒示例 brief |
 | `references/brief-schema.md` | brief 数据结构 |
@@ -87,12 +89,11 @@ npm run dev
 只想要文本交付时可以跳过；要出成片时按这条走，实测 68 秒 1080p 约 6 分钟、现金 0 元。
 
 ```bash
-bash scripts/bootstrap-remotion.sh my-video && cd my-video
-cp -r ../template/src/kit ../template/src/scenes src/ && cp ../template/src/Root.tsx src/Root.tsx
-mkdir -p styles && cp ../assets/styles/*.json styles/
+bash scripts/new-project.sh my-video --example ai-history   # 一条命令铺好脚手架/模板/风格/示例
+cd my-video
 python -m pip install edge-tts
 
-cp ../assets/example-memory-brief.json video-brief.json
+cp ../assets/example-memory-brief.json video-brief.json     # 想换成记忆那期就换这份
 python ../scripts/make-narration.py --project . --update-brief   # 旁白决定镜头长度
 python ../scripts/make-bgm.py --project .                        # 原创 BGM
 npx remotion still KnowledgeVideo out/check.png --frame=300 --scale=0.5

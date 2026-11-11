@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Audio, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, Series, staticFile, useCurrentFrame, useVideoConfig, getStaticFiles } from "remotion";
 import timing from "../../narration-timing.json";
 import { ClipReveal, cubicBezier } from "../kit/anim";
 import { audio as audioTok, font, palette, post } from "../kit/tokens";
@@ -7,6 +7,10 @@ import { PaperTexture, PostFX } from "../kit/PostFX";
 import { Captions, type Word } from "../kit/Captions";
 
 /* ---------- 通用 ---------- */
+/** public 下是否存在该音频（新工程还没跑脚本时不至于直接崩） */
+const staticSet = new Set(getStaticFiles().map((f) => f.name.replace(/^\.\//, "")));
+const hasAudio = (name: string) => staticSet.has(name) || [...staticSet].some((n) => n.endsWith(name));
+
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const prog = (frame: number, delay: number, dur: number, curve: readonly [number, number, number, number] = [0.16, 1, 0.3, 1]) =>
   cubicBezier(clamp01((frame - delay) / dur), ...curve);
@@ -143,7 +147,7 @@ const Scene: React.FC<{ id: string; children: React.ReactNode; captions?: boolea
       {footer ? <Footer note={footer} delay={20} /> : null}
       {source ? <SourceNote text={source} delay={26} /> : null}
       {captions ? <Captions text={t.text} audioSeconds={t.audioSeconds} words={(t as { words?: Word[] }).words} /> : null}
-      <Audio src={staticFile(`audio/narr-${id}.mp3`)} />
+      {hasAudio(`audio/narr-${id}.mp3`) ? <Audio src={staticFile(`audio/narr-${id}.mp3`)} /> : null}
     </AbsoluteFill>
   );
 };
@@ -568,15 +572,17 @@ export const KnowledgeVideo: React.FC = () => {
       </Series>
 
       {/* BGM：循环铺底，首尾淡入淡出 */}
-      <Audio
-        src={staticFile("audio/bgm.wav")}
-        loop
-        volume={(f) => {
-          const fadeOut = Math.min(1, Math.max(0, (durationInFrames - f) / (audioTok.bgmFadeOut * fps)));
-          const fadeIn = Math.min(1, Math.max(0, f / (audioTok.bgmFadeIn * fps)));
-          return audioTok.bgmVolume * fadeIn * fadeOut;
-        }}
-      />
+      {hasAudio("audio/bgm.wav") ? (
+        <Audio
+          src={staticFile("audio/bgm.wav")}
+          loop
+          volume={(f) => {
+            const fadeOut = Math.min(1, Math.max(0, (durationInFrames - f) / (audioTok.bgmFadeOut * fps)));
+            const fadeIn = Math.min(1, Math.max(0, f / (audioTok.bgmFadeIn * fps)));
+            return audioTok.bgmVolume * fadeIn * fadeOut;
+          }}
+        />
+      ) : null}
 
       <PostFX grain={post.grain} vignette={post.vignette} bloom={post.bloom} aberration={post.aberration} />
     </AbsoluteFill>

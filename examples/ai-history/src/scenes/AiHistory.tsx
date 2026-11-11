@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Audio, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, Series, staticFile, useCurrentFrame, useVideoConfig, getStaticFiles } from "remotion";
 import timing from "../../narration-timing.json";
 import { ClipReveal, cubicBezier } from "../kit/anim";
 import { audio as audioTok, font, palette, post } from "../kit/tokens";
@@ -10,6 +10,10 @@ import { Captions } from "../kit/Captions";
    AI 十四年 · 纸感编辑风
    6 幕：hook / foundation / scale / multimodal / china / prospect
    ===================================================================== */
+
+/** public 下是否存在该音频（新工程还没跑脚本时不至于直接崩） */
+const staticSet = new Set(getStaticFiles().map((f) => f.name.replace(/^\.\//, "")));
+const hasAudio = (name: string) => staticSet.has(name) || [...staticSet].some((n) => n.endsWith(name));
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const prog = (frame: number, delay: number, dur: number, curve: readonly [number, number, number, number] = [0.16, 1, 0.3, 1]) =>
@@ -589,7 +593,7 @@ const SceneShell: React.FC<{ scene: (typeof timing)["scenes"][number]; children:
   <AbsoluteFill>
     {children}
     <Captions text={scene.text} audioSeconds={scene.audioSeconds} words={(scene as { words?: { text: string; start: number; end: number }[] }).words} />
-    <Audio src={staticFile(`audio/narr-${scene.id}.mp3`)} />
+    {hasAudio(`audio/narr-${scene.id}.mp3`) ? <Audio src={staticFile(`audio/narr-${scene.id}.mp3`)} /> : null}
   </AbsoluteFill>
 );
 
@@ -610,15 +614,17 @@ export const AiHistory: React.FC = () => {
           );
         })}
       </Series>
-      <Audio
-        src={staticFile("audio/bgm.wav")}
-        loop
-        volume={(f) => {
-          const fadeOut = Math.min(1, Math.max(0, (durationInFrames - f) / (audioTok.bgmFadeOut * fps)));
-          const fadeIn = Math.min(1, Math.max(0, f / (audioTok.bgmFadeIn * fps)));
-          return audioTok.bgmVolume * fadeIn * fadeOut;
-        }}
-      />
+      {hasAudio("audio/bgm.wav") ? (
+        <Audio
+          src={staticFile("audio/bgm.wav")}
+          loop
+          volume={(f) => {
+            const fadeOut = Math.min(1, Math.max(0, (durationInFrames - f) / (audioTok.bgmFadeOut * fps)));
+            const fadeIn = Math.min(1, Math.max(0, f / (audioTok.bgmFadeIn * fps)));
+            return audioTok.bgmVolume * fadeIn * fadeOut;
+          }}
+        />
+      ) : null}
       <PostFX grain={post.grain} vignette={post.vignette} bloom={post.bloom} aberration={post.aberration} />
     </AbsoluteFill>
   );
