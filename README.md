@@ -13,6 +13,8 @@
 - 可选成品化管线（`scripts/` + `template/`）：旁白决定镜头长度、程序合成 BGM、SRT 字幕、响度归一，**全程 0 元**
 - 视觉风格由 `styles/*.json` token 驱动，换风格不改代码
 
+> 新会话从哪开始、一句话怎么提需求、环境在哪：见 [START.md](START.md)。
+
 ## 安装
 
 把本仓库作为 Skill 安装到支持 Agent Skills 的工具中，或者复制到个人 Skills 目录：

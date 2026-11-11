@@ -1,6 +1,6 @@
 ---
 name: vibe-knowledge-video
-description: Create polished Chinese knowledge-explainer videos with Remotion from a topic or source material. Use when the user asks for a Vibe 知识大赏-style science, technology, history, business, psychology, or general knowledge video; wants a Remotion project, animated explainer, coded video, narration script, storyboard, subtitles, preview clip, or final MP4; or wants to turn documents and verified research into visual video scenes.
+description: Create polished Chinese knowledge-explainer videos with Remotion from a topic or source material. Use when the user asks for a knowledge / science / explainer video (知识视频、科普视频、讲解视频、成片、一条视频), a Remotion project, animated explainer, coded video, narration (旁白/配音), storyboard, subtitles (字幕), BGM (配乐), preview clip, or final MP4; or wants to turn documents and verified research into visual video scenes. Ships a 0-cost pipeline: free edge-tts narration with word-level timing, synthesized BGM, SRT + burned-in captions, static-gain mastering.
 ---
 
 # Vibe Knowledge Video
