@@ -55,6 +55,14 @@ For a single continuous protagonist, instantiate the subject once outside scene-
 
 Use a dark editorial background, one bright accent color, restrained glow, large Chinese typography, thin grid lines, and purposeful motion. Avoid excessive particles, card grids, random gradients, fake 3D, and constant camera movement. Let the concept determine the animation.
 
+## 工具箱选型（什么时候加依赖）
+
+默认只走核心层：Remotion + 模板 `kit/` + edge-tts + 合成 BGM/SFX + Remotion 自带 ffmpeg。**不要为了“看起来更高级”加依赖。**
+
+先查 [references/toolbox.md](references/toolbox.md) 的决策表，再按触发条件接：公式推导→Manim 渲序列帧；现成矢量动效→`@remotion/lottie`；真实三维结构→`@remotion/three` 或 Blender 序列帧；真实软件界面→OBS 录屏 + `<OffthreadVideo muted>`；外部配音→WhisperX 对齐；外部音乐踩点→librosa。Anime.js / Motion / Jolt / three.quarks / three-gpu-pathtracer / Tweakpane 已判定不引入（理由见该文档第六节）。
+
+加依赖前回答三问：同一帧能否同图（种子/版本/命令写进工程 `render-notes.md`）、素材是否授权、渲染时间是否超基线一倍以上（95 秒 1080p ≈ 8 分钟）。新路线必须“一张静帧 → 3 秒片段 → 全片”逐级验证，没出过静帧不写进 brief。环境是否具备先跑 `bash scripts/toolcheck.sh <工程目录>`。
+
 **竖屏**不做横屏裁切：重排构图重心、字号阶梓与字幕断行，安全区和字幕基线写进 token（见 `production-workflow.md` 第十节）。
 
 ## Style tokens
@@ -118,6 +126,7 @@ Do not call the video complete until:
 - 叙事片：没有无可靠来源的具体数字；证物框里没有无授权图片；
 - 如果本轮需求包含人物表演/笑点，已明确告知能力边界并给出无表演的替代方案，而不是交出扭捏的角色动画；
 - media licenses and attributions are recorded;
+- 若用了外部渲染器（Manim / Blender / ComfyUI）或外部素材，渲染命令、版本、种子与授权已写进工程，别人能复现或明确知道无法复现；
 - the full render command succeeds.
 - the delivered MP4 passes a complete FFmpeg decode and `ffprobe` confirms H.264/yuv420p plus AAC-LC whenever audio is present;
 - if the file is uploaded, download or materialize that uploaded artifact and verify its size, hash, and decodability instead of assuming upload success means media integrity.

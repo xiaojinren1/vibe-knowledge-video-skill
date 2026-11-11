@@ -102,6 +102,23 @@ npx remotion render DossierVideo out/v.mp4 --concurrency=6 --crf=19
 跟着 `assets/styles/archive-dossier.json` 的 token 走，换风格不改组件。
 
 
+## 遇到特定需求再查：工具箱（别提前装）
+
+默认路线不需要任何额外依赖。碰到下面这些信号，先看 `references/toolbox.md` 再动手：
+
+| 需求 | 用哪个 | 备注 |
+|---|---|---|
+| 公式推导 / 几何证明 | Manim 渲序列帧 → Remotion `<Img>` | 要 LaTeX，命令必须落盘 |
+| 现成矢量动效（AE 导出） | `@remotion/lottie` | json 授权要记录 |
+| 真实三维结构 | `@remotion/three`，或 Blender 渲 PNG 序列 | 渲染时间 ×2 以上 |
+| 真实软件界面 | OBS 录屏 + `<OffthreadVideo muted>` | 旁白字幕仍在 Remotion 层 |
+| 用户提供的配音 | WhisperX 对齐 → `narration-timing.json` | edge-tts 路线不需要 |
+| 外部授权音乐踩点 | librosa 取 BPM/节拍 | 自产 BGM 已知 BPM，不用 |
+| 特殊音色 / 方言 | CosyVoice（需算力 + 授权） | **禁止克隆真人** |
+
+先确认本机能不能走：`bash scripts/toolcheck.sh <工程目录>`（会报 NVIDIA、Blender、Manim、librosa 等）。
+判定不引入的：Anime.js、Motion、Tweakpane、Jolt Physics、three.quarks、three-gpu-pathtracer、WebGL 版 postprocessing。
+
 ## 成本与时间（实测，8 核 16G 无独显）
 
 | 环节 | 时间 |
