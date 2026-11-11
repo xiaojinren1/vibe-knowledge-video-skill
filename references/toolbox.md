@@ -48,7 +48,7 @@
 | 工具 | 什么时候用 | 不触发时用什么 | 代价 / 风险 |
 |---|---|---|---|
 | **CosyVoice** | 系列片要固定音色、要方言、要零样本克隆（且音色已授权） | `scripts/make-narration.py`（edge-tts，免费、带字级边界） | 需推理算力，本机 CPU 很慢；**禁止克隆真人**；换音色后字级边界仍需 `WordBoundary` 或 WhisperX 兜底 |
-| **WhisperX** | 音频是**用户提供的成品**（成片配音、访谈、口播），没有脚本也没有时间戳 | edge-tts 路线的 `WordBoundary` 已经够，不需要 | CPU 可跑 small 模型；输出要对齐成 `narration-timing.json` 的 `words[]`（ms 级）再喂 `make-srt.py` |
+| **WhisperX** | 音频是**用户提供的成品**（成片配音、访谈、口播），没有脚本也没有时间戳 | edge-tts 路线的 `WordBoundary` 已经够，不需要 | CPU 可跑 small 模型；输出要对齐成 `narration-timing.json` 的 `words[]`（ms 级）再喂 `make-srt.py`。参考片拆解（`scripts/video-digest.py`）默认走这条 |
 | **librosa** | 用的是**外部授权音乐**，需要 BPM/节拍让画面踩点 | 自产 BGM（`make-bgm.py`）的 BPM 是自己定的，直接写常量 | 自产音乐不要引 librosa；外部音乐要记录曲名/授权 |
 
 ## 四、决策表：什么需求走哪条（以后照这个查）
@@ -63,6 +63,7 @@
 | 真实软件界面 | OBS 录屏 → `<OffthreadVideo muted>` | 画中画，四周留版式边距 |
 | 用户给了配音音频 | WhisperX 对齐 → `narration-timing.json` | 再跑 `make-srt.py` |
 | 系列片要同一把嗓子 | edge-tts 固定 voice/rate，或 CosyVoice（有授权+算力） | 写进 brief 的 `voice` 字段 |
+| 用户给了一条参考视频/对标片/长访谈 | `scripts/video-digest.py` 拆成时间码笔记 | `research/video-notes/<slug>/notes.md` + frames |
 | 音乐要踩点 | 自产 BGM 定 BPM；外部音乐才上 librosa | 节拍点写成 JSON，动画读常量 |
 | 需要"照片感"底纹 | 代码生成纹理；有 NVIDIA 才考虑 ComfyUI | 只做背景，不做事实画面 |
 

@@ -113,6 +113,7 @@ npx remotion render DossierVideo out/v.mp4 --concurrency=6 --crf=19
 | 真实三维结构 | `@remotion/three`，或 Blender 渲 PNG 序列 | 渲染时间 ×2 以上 |
 | 真实软件界面 | OBS 录屏 + `<OffthreadVideo muted>` | 旁白字幕仍在 Remotion 层 |
 | 用户提供的配音 | WhisperX 对齐 → `narration-timing.json` | edge-tts 路线不需要 |
+| 用户甩来一条参考视频 | `python ../scripts/video-digest.py ref.mp4 --project .` | 抽帧 + 时间码笔记，画面事实看帧填 |
 | 外部授权音乐踩点 | librosa 取 BPM/节拍 | 自产 BGM 已知 BPM，不用 |
 | 特殊音色 / 方言 | CosyVoice（需算力 + 授权） | **禁止克隆真人** |
 

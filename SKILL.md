@@ -1,6 +1,6 @@
 ---
 name: vibe-knowledge-video
-description: Create polished Chinese knowledge-explainer videos with Remotion from a topic or source material. Use when the user asks for a knowledge / science / explainer video (知识视频、科普视频、讲解视频、成片、一条视频), a Remotion project, animated explainer, coded video, narration (旁白/配音), storyboard, subtitles (字幕), BGM (配乐), preview clip, or final MP4; or wants to turn documents and verified research into visual video scenes. Ships a 0-cost pipeline: free edge-tts narration with word-level timing, synthesized BGM, SRT + burned-in captions, static-gain mastering.
+description: Create polished Chinese knowledge-explainer videos with Remotion from a topic or source material. Use when the user asks for a knowledge / science / explainer video (知识视频、科普视频、讲解视频、成片、一条视频), a Remotion project, animated explainer, coded video, narration (旁白/配音), storyboard, subtitles (字幕), BGM (配乐), preview clip, or final MP4; wants to digest a reference video / benchmark film / long interview into timecoded notes before writing scenes (拆片、对标片、参考视频、蒸馏视频); or wants to turn documents and verified research into visual video scenes. Ships a 0-cost pipeline: free edge-tts narration with word-level timing, synthesized BGM, SRT + burned-in captions, static-gain mastering.
 ---
 
 # Vibe Knowledge Video
@@ -10,7 +10,7 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 ## Core workflow
 
 1. Confirm or infer the topic, audience, aspect ratio, target duration, language, and whether narration is required. If details are missing, default to Chinese, general adult audience, 16:9, 60–120 seconds, 30 fps, with narration script and burned-in Chinese captions.
-2. Research the topic before writing. Prefer primary sources, papers, standards, official statistics, and reputable institutions. Record every factual claim in `research/sources.md` with URL, title, date, and the claim it supports.
+2. Research the topic before writing. Prefer primary sources, papers, standards, official statistics, and reputable institutions. Record every factual claim in `research/sources.md` with URL, title, date, and the claim it supports. If the user points at a reference video, long interview, talk, or tutorial ("跟着这个讲法做"、"这条片子拆一下"), digest it locally first with `scripts/video-digest.py` (see [references/video-distill.md](references/video-distill.md)): frames + timecoded notes, then fill the 画面事实 / 屏幕文字 columns **from the frames, never from guessing the voice-over**, and cite video claims with `mm:ss`.
 3. Separate verified facts, interpretation, and analogy. Remove unsupported claims. Do not invent quotations, studies, numbers, dates, or causal relationships.
 4. Create `video-brief.json` using [references/brief-schema.md](references/brief-schema.md). Run `node scripts/validate-brief.mjs video-brief.json` before coding scenes.
 5. Create a scene plan with a strong question in the first 3 seconds, one idea per scene, a visual payoff every 5–8 seconds, and a concise ending. Preserve one clear narrative spine. Remove historical comparisons, side facts, or extra timelines when they interrupt the requested explanation rather than advancing it. Use [references/storyboard-guide.md](references/storyboard-guide.md).

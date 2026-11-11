@@ -14,6 +14,7 @@
 - 可选成品化管线：旁白决定镜头长度、程序合成 BGM + 音效、SRT 字幕、响度归一，**全程 0 元**
 - 视觉风格由 `styles/*.json` token 驱动，换风格不改代码
 - 3D / 公式 / 界面实录这类需求，按 [references/toolbox.md](references/toolbox.md) 的触发条件按需接入（默认零额外依赖）
+- 用户给了参考片/长访谈，先本地拆成时间码笔记：`scripts/video-digest.py`（见 [references/video-distill.md](references/video-distill.md)）
 
 **做不了**：人物表演、漫剧、真人向、喜剧节奏。这类需求靠逐帧美术判断，代码渲不到发布水准，
 先看 [references/code-video-limits.md](references/code-video-limits.md)，再用“把表演换成证据”的替代方案。
@@ -83,6 +84,8 @@ npm run dev
 | `references/code-video-limits.md` | **能力边界**：代码渲视频能做什么、做不了什么，以及"表演改证据"的替代方案 |
 | `references/toolbox.md` | **工具选型**：20 个动效工具的接入/不引入判定、按需求查的决策表 |
 | `scripts/toolcheck.sh` | 工具箱体检：本机能走哪条路线（NVIDIA/Blender/Manim/librosa…） |
+| `scripts/video-digest.py` | 参考视频拆解：抽音轨 + 关键帧 + 联系表 + 时间码笔记（本地、0 元、不上传） |
+| `references/video-distill.md` | **参考视频→可执行拆解**：链路、ffmpeg 两档、与云端蒸馏的取舍、合规 |
 | `references/research-ai-video-routes.md` | 五条 AI 视频路线与 9 个开源项目的调研对比 |
 | `scripts/make-narration.py` | 由 brief 生成旁白（edge-tts）并写回真实时长 |
 | `scripts/make-bgm.py` | numpy 合成原创 BGM（确定性、可商用） |

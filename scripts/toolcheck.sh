@@ -42,6 +42,7 @@ fi
 echo
 echo "== 按需路线（见 references/toolbox.md 第三节）=="
 py_has librosa   && ok "librosa"   "外部音乐踩点可用"     || miss "librosa"   "需要时才装：pip install librosa"
+have yt-dlp      && ok "yt-dlp"    "可下载参考视频（只限有权保存的）" || miss "yt-dlp"    "需拆网络视频时才装：pip install yt-dlp"
 py_has whisperx  && ok "WhisperX"  "外部音频字级对齐可用" || miss "WhisperX"  "需要时才装：pip install whisperx"
 have manim       && ok "Manim"     "公式/几何片段可用"    || miss "Manim"     "需要时才装：pip install manim（另需 LaTeX）"
 have blender     && ok "Blender"   "3D 资产序列帧可用"    || miss "Blender"   "需要时才装（本机无独显，走 Cycles CPU）"
