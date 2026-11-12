@@ -15,7 +15,7 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 4. Create `video-brief.json` using [references/brief-schema.md](references/brief-schema.md). Run `node scripts/validate-brief.mjs video-brief.json` before coding scenes.
 5. Create a scene plan with a strong question in the first 3 seconds, one idea per scene, a visual payoff every 5–8 seconds, and a concise ending. Preserve one clear narrative spine. Remove historical comparisons, side facts, or extra timelines when they interrupt the requested explanation rather than advancing it. Use [references/storyboard-guide.md](references/storyboard-guide.md).
 6. If no Remotion project exists, run `bash scripts/bootstrap-remotion.sh <project-directory>`. This scaffolds the official blank template and installs the official Remotion Agent Skills. Never overwrite an existing non-empty directory.
-7. Implement the video in Remotion. Read the official Remotion Skills installed in the project before editing. Use frame-driven animation with `useCurrentFrame()`, `interpolate()`, `spring()`, `Sequence`, and `Series`; do not use CSS animations, random values, or wall-clock time.
+7. Implement the video in Remotion. Read the official Remotion Skills installed in the project before editing. Use frame-driven animation with `useCurrentFrame()`, `interpolate()`, `spring()`, `Sequence`, and `Series`; do not use CSS animations, random values, or wall-clock time. For element reveal timing inside a scene, anchor to the narration words instead of hand-counting frames: declare `elements[{id, at}]` in the brief and use `anchorFrame()` / `useAnchor()` from `template/src/kit/cues.ts` — hardcoded `delay={26}` breaks the moment the voice-over changes (see [references/cue-anchoring.md](references/cue-anchoring.md)).
 8. Prefer native HTML, SVG, Canvas, equations, charts, timelines, maps, and purposeful illustrations. For a recognizable real subject such as a vehicle, machine, animal, person, or product, do not use a crude stick figure or generic geometric outline as the final visual. Preserve the subject's silhouette, proportions, defining components, and functional structure. When the user provides reference images, inspect them first and create an original detailed visual rather than copying the source. For moving subjects, read [references/motion-direction-prompt.md](references/motion-direction-prompt.md) and define contact geometry, proportions, motion coupling, occlusion, and scene continuity before implementation. Use external images or clips only when they materially improve understanding and their license/source is recorded.
 9. Add narration only from user-provided audio or an available authorized TTS service. Do not silently upload private text to an external voice service. Put media in `public/` and load it with `staticFile()`.
 10. When background music is requested, use licensed music with recorded attribution or generate an original deterministic track. Build music from chords, rhythm, melody, and envelopes; do not use white, pink, or brown noise as an audible music bed. Keep music under narration and test it on ordinary phone or laptop speakers. Use `scripts/generate-light-science-music.py` for a neutral original starting point.
@@ -30,6 +30,8 @@ Turn a topic into a source-backed Remotion project and an exportable video. Opti
 - Put editable content in data files rather than scattering copy through components.
 - Build reusable components for title, caption, chart, timeline, and scene transition. Keep source metadata in the project, but do not burn source names, dates, or reference labels into the video by default. Show an on-screen source only when the user requests it, a quotation requires attribution, or the claim would otherwise be misleading.
 - Use deterministic animation and stable seeds when procedural graphics are needed.
+- 元素出点用锚点，不手写帧号：幕内新增的图形、标注、箭头、数字统一走 `elements[]` + `anchorFrame()`；同一幕内所有元素共用一条时间轴，不各写各的 `delay`。改旁白后先跑 `node scripts/validate-brief.mjs`（锚点必须在旁白里）再渲。
+- 风格底线是硬约束：每个 `styles/*.json` 都有 `negative` 与 `styleLock`，审静帧时逐条对照。新增风格不写这两项，等于把旧风格的底线带过去。
 - Use safe typography: system Chinese fonts first unless a redistributable local font is bundled.
 - Check portrait output separately; do not simply crop a landscape composition.
 - Prefer continuous explanatory action over static stickers: keep the main subject moving while labels, arrows, diagrams, and narration explain what is happening. Couple translation, rotating parts, suspension or body motion, spray or dust, and background parallax to the same frame-driven speed signal.
@@ -97,6 +99,9 @@ python scripts/make-narration.py --project . --update-brief
 python scripts/make-bgm.py --project .
 python scripts/make-sfx.py --cues cues.json --duration 64 --out public/audio/sfx.wav
 python scripts/make-srt.py --project .
+
+node scripts/selftest-cues.mjs                                  # 锚点纯计算自检（Node ≥22.6）
+python scripts/still-sheet.py out/review-frames --fps 30        # 静帧 → HTML 联系表
 ```
 
 On Windows, pass composition props using a JSON file rather than inline shell JSON.
@@ -108,6 +113,9 @@ Do not call the video complete until:
 - every factual claim has a source or is clearly labeled as interpretation;
 - the brief validator passes;
 - representative still frames from the opening, scene midpoints, transitions, and ending have been reviewed;
+- the review frames have been looked at as one contact sheet (`scripts/still-sheet.py`), so pacing gaps and near-identical scenes are visible;
+- 每个 `elements[]` 锚点都通过了 `validate-brief.mjs`，且抽看了元素出现处的那几秒（元素出现帧 / 旁白当前词 / 字幕当前行三者对齐）；
+- 静帧逐条对过当前风格的 `negative` 与 `styleLock`，没有破底线；
 - every scene containing the main subject has been reviewed at least once; do not approve subject geometry from only the final frame;
 - explanatory text, labels, arrows, and progress indicators do not overlap the main subject or captions at any reviewed frame;
 - no text is clipped at 16:9 or the requested format;

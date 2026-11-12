@@ -15,6 +15,7 @@
 - 视觉风格由 `styles/*.json` token 驱动，换风格不改代码
 - 3D / 公式 / 界面实录这类需求，按 [references/toolbox.md](references/toolbox.md) 的触发条件按需接入（默认零额外依赖）
 - 用户给了参考片/长访谈，先本地拆成时间码笔记：`scripts/video-digest.py`（见 [references/video-distill.md](references/video-distill.md)）
+- 画面元素按旁白词出场：`elements[]` + `anchorFrame()`，不手写帧号（见 [references/cue-anchoring.md](references/cue-anchoring.md)）
 
 **做不了**：人物表演、漫剧、真人向、喜剧节奏。这类需求靠逐帧美术判断，代码渲不到发布水准，
 先看 [references/code-video-limits.md](references/code-video-limits.md)，再用“把表演换成证据”的替代方案。
@@ -86,6 +87,10 @@ npm run dev
 | `scripts/toolcheck.sh` | 工具箱体检：本机能走哪条路线（NVIDIA/Blender/Manim/librosa…） |
 | `scripts/video-digest.py` | 参考视频拆解：抽音轨 + 关键帧 + 联系表 + 时间码笔记（本地、0 元、不上传） |
 | `references/video-distill.md` | **参考视频→可执行拆解**：链路、ffmpeg 两档、与云端蒸馏的取舍、合规 |
+| `references/cue-anchoring.md` | **元素级字幕锚定**：说到才出现，锚点规则/降级/brief 字段 |
+| `scripts/still-sheet.py` | 审片静帧 → HTML 联系表（帧号自动转时间码） |
+| `scripts/selftest-cues.mjs` | 锚点纯计算自检（标点归一化/跨 token/帧换算/重复取首次） |
+| `template/src/kit/cues.ts` `useAnchor.ts` | 锚点纯函数与 React hooks（`useAnchor` / `useAnchorProgress`） |
 | `references/research-ai-video-routes.md` | 五条 AI 视频路线与 9 个开源项目的调研对比 |
 | `scripts/make-narration.py` | 由 brief 生成旁白（edge-tts）并写回真实时长 |
 | `scripts/make-bgm.py` | numpy 合成原创 BGM（确定性、可商用） |

@@ -42,3 +42,7 @@ export const post = style.postEffects;
 export const captions = style.captions;
 export const layout = style.layout;
 export const audio = style.audio;
+
+/** 风格底线：静帧审查时逐条对照，破一条就返工（见 references/cue-anchoring.md） */
+export const negative = (style.negative ?? []) as string[];
+export const styleLock = (style.styleLock ?? []) as string[];

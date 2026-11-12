@@ -84,6 +84,18 @@ npx remotion render KnowledgeVideo out/v.mp4 --concurrency=6 --crf=19
 
 **纪律：先看图，再渲片。** 静帧 3–6 秒一张，全片 5–6 分钟；用静帧抓版面问题，比渲完再发现问题省一个数量级的时间。
 
+**把帧拼成联系表再看**（比一张张点开快，也不容易漏掉中间某一幕）：
+
+```bash
+npx remotion render KnowledgeVideo out/review-frames --frames=0,450,900,1350,1800,2250 --image-format=png
+python ../scripts/still-sheet.py out/review-frames --fps 30 --title "<片名> · 审片"
+# 输出 out/review-frames/review-sheet.html，浏览器直接打开；文件名里的帧号会转成时间码
+```
+
+联系表审的是**整片节奏**（哪一段一直在同一构图、哪两幕长得太像），细节仍要回单帧看。
+
+**元素出点要用锚点，不要手写帧号**：见 [cue-anchoring.md](cue-anchoring.md)。改一句旁白，`delay={26}` 全部错位；锚定到 words 的出点会跟着配音走。
+
 ## 四·五、字幕排版惯例
 
 - **句末不加句号/逗号**：`make-srt.py` 与 `Captions.tsx` 都会剥掉句尾的 `。，、；：`；

@@ -114,11 +114,19 @@ npx remotion render DossierVideo out/v.mp4 --concurrency=6 --crf=19
 | 真实软件界面 | OBS 录屏 + `<OffthreadVideo muted>` | 旁白字幕仍在 Remotion 层 |
 | 用户提供的配音 | WhisperX 对齐 → `narration-timing.json` | edge-tts 路线不需要 |
 | 用户甩来一条参考视频 | `python ../scripts/video-digest.py ref.mp4 --project .` | 抽帧 + 时间码笔记，画面事实看帧填 |
+| 幕内元素什么时候出场 | brief 写 `elements[{id, at}]`，组件用 `anchorFrame()` | 跟着旁白走，不手写 delay（`references/cue-anchoring.md`） |
+| 审片一堆静帧看不完 | `python scripts/still-sheet.py out/review-frames` | 出 HTML 联系表，帧号自动转时间码 |
 | 外部授权音乐踩点 | librosa 取 BPM/节拍 | 自产 BGM 已知 BPM，不用 |
 | 特殊音色 / 方言 | CosyVoice（需算力 + 授权） | **禁止克隆真人** |
 
 先确认本机能不能走：`bash scripts/toolcheck.sh <工程目录>`（会报 NVIDIA、Blender、Manim、librosa 等）。
 判定不引入的：Anime.js、Motion、Tweakpane、Jolt Physics、three.quarks、three-gpu-pathtracer、WebGL 版 postprocessing。
+
+## 两个新增的“新东西”（2026-11）
+
+1. **元素级字幕锚定**：幕内元素不再手写 `delay={26}`，而是锚到配词的 `words`——改一句旁白，画面自动跟着走。
+   brief 里写 `elements[{id, at}]`，`validate-brief.mjs` 会校验锚点是否真在旁白里；组件用 `anchorFrame()/useAnchor()`。见 `references/cue-anchoring.md`。
+2. **风格底线清单**：每个 `styles/*.json` 多了 `negative`（不许出现什么）与 `styleLock`（不许动的数字），审静帧逐条对。
 
 ## 成本与时间（实测，8 核 16G 无独显）
 

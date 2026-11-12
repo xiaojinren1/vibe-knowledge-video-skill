@@ -14,6 +14,8 @@
 | `audio` | BGM 音量、淡入淡出、目标响度 | −16 LUFS / −1.5 dBTP |
 | `captions` | 位置、每屏字数、背景、入点 | ≤22 字、≤2 行 |
 | `layout` | 页眉 / 分栏线 / 页脚 / 印章锚点 | 全片同一套锚点，不要每幕重摆 |
+| `negative` | 负向清单：这个风格**不允许**出现的东西 | 审静帧时逐条对照，破一条就返工 |
+| `styleLock` | 不变量：色数、颗粒上限、字幕行数等硬数字 | 与 `negative` 一起构成“风格底线” |
 
 ## 已实现
 
@@ -54,9 +56,19 @@
 > 风格来源与取舍（含 9 个「Vibe 知识大赏」开源项目的对比）见 `references/research-ai-video-routes.md`。
 > 哪种题材适合代码渲视频、哪些做不了：见 `references/code-video-limits.md`。
 
+## 风格底线（negative / styleLock）
+
+每个风格 JSON 都带两项，供审片与 Agent 自检使用：
+
+- `negative`：**不允许出现**的东西。如纸感风禁止“3D 渲染感、赛博霓虹、人物表情表演、冒充证据的截图、水印”。
+- `styleLock`：**不许动的数字**。如“色板 ≤3 色、颗粒 4–5%、字幕 ≤22 字、竖屏基线 y=1392”。
+
+`template/src/kit/tokens.ts` 导出 `negative`、`styleLock`，审查时逐条对照静帧；`SKILL.md` 的 completion gate 也引用了这两份清单。新增风格时**必须**同时写这两项，否则风格会在第 3、5 幕慢慢漂移。
+
 ## 新增一个风格的步骤
 
 1. 复制 `assets/styles/paper-editorial.json` → `assets/styles/<id>.json`，改色板与字体
-2. 在 `template/src/kit/tokens.ts` 里把 import 指到新文件（或改成按环境变量切换）
-3. 渲 3 张静帧（开场 / 中段 / 结尾）确认可读性，再渲全片
-4. 把 id 记进上面两张表
+2. 补 `negative` / `styleLock`（不写就把旧风格的底线带过去了）
+3. 在 `template/src/kit/tokens.ts` 里把 import 指到新文件（或改成按环境变量切换）
+4. 渲 3 张静帧（开场 / 中段 / 结尾）确认可读性，再渲全片
+5. 把 id 记进上面两张表

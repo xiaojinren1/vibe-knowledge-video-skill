@@ -23,3 +23,25 @@ Create `video-brief.json` with this shape:
 - Use `verified`, `interpretation`, or `unverified` for claim status.
 - Remove `unverified` claims from final narration unless explicitly framed as uncertainty.
 
+## elements（元素级出点锚点，可选但推荐）
+
+```json
+"scenes": [{
+  "id": "mechanism",
+  "narration": "过去十四年，人工智能换过三次主角……",
+  "elements": [
+    { "id": "e-mech-1", "label": "人工智能", "at": "人工智能" },
+    { "id": "e-mech-2", "label": "三次主角", "at": "换过三次主角" }
+  ]
+}]
+```
+
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| `id` | ✅ | 幕内唯一，建议 `e-<幕>-<序号>` |
+| `at` | ✅ | 锚点：**逐字出现在本幕 `narration` 里**的一段文字（2–8 字，标点会被归一化） |
+| `label` | | 人看的名字，便于审片对齐 |
+
+校验规则：`id` 唯一、`at` 非空且能在旁白里找到；找不到直接报错（否则渲染时会静默退回幕首）。
+用法与规则见 [cue-anchoring.md](cue-anchoring.md)。
+
